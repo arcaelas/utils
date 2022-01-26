@@ -2,7 +2,7 @@
   "version": "1.11.0",
   "name": "@arcaelas/utils",
   "main": "./src/index.js",
-  "description": "Simple tools for maintaining and using @arcaelas.",
+  "description": "A small box of tools, which are implemented in different factions of the library.",
   "scripts": {
     "start": "tsc --watch",
     "prepublishOnly": "tsc && npm version minor",
@@ -10,8 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arcaelas/arcaelas.git",
-    "directory": "utils"
+    "url": "git+ssh://github.com/Arcaelas-Insiders-ES/utils.git"
   },
   "keywords": [
     "utils",
