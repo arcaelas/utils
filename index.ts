@@ -44,7 +44,7 @@ export function empty<T extends any = any>(value: T): boolean {
 };
 
 /**
- * @description "Blank" is a method to check if a value is {never} or is empty value.
+ * @description "Blank" is a method to check if a value is never or is empty value.
  * @example
  * blank('') // true
  * blank([]) // true
