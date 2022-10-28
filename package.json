@@ -4,23 +4,25 @@
   "main": "./src/index.js",
   "description": "A small box of tools, which are implemented in different factions of the library.",
   "scripts": {
-    "start": "tsc --watch",
-    "prepublishOnly": "tsc && npm version minor",
-    "commit": "npm publish --access=public && rm -rf ./src"
+    "commit": "npm publish --access=public && rm -rf ./src ./lib",
+    "prepublishOnly": "tsc && npm version minor"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://github.com/Arcaelas-Insiders-ES/utils.git"
+    "url": "git+ssh://github.com/arcaelas/utils.git"
   },
   "keywords": [
     "utils",
     "tools",
-    "@arcaelas",
+    "arcaelas",
+    "arcaelas insiders",
+    "arcaelas-insiders",
     "javascript"
   ],
   "author": {
-    "name": "Alejandor Reyes",
-    "email": "arcaelas.reyes@gmail.com"
+    "name": "Arcaelas Insiders",
+    "email": "arcaela.reyes@gmail.com",
+    "url": "http://github.com/arcaelas/"
   },
   "license": "ISC",
   "bugs": {
