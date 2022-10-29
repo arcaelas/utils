@@ -50,7 +50,7 @@ empty([ false ])  // false
 empty([ undefined ])  // false
 ```
 
-### blank( value?: *any* ): *boolean* 
+### blank( value?: *any* ): *boolean*
 "**Blank**" is a method to check if a value **is never** or **is empty** value.
 ```javascript
 import { blank } from '@arcaelas/utils'
@@ -175,7 +175,7 @@ function SignOut(){
 ```
 
 ## Working with Objects
-**Object-oriented Programming** (*[OOP](https://en.wikipedia.org/wiki/Object-oriented_programming)*) is very common nowadays, but although **EcmaScript** allows us many functionalities regarding this development model, we are still limited in many fields, here we will show you how to use some of our tools to make your life easier. 
+**Object-oriented Programming** (*[OOP](https://en.wikipedia.org/wiki/Object-oriented_programming)*) is very common nowadays, but although **EcmaScript** allows us many functionalities regarding this development model, we are still limited in many fields, here we will show you how to use some of our tools to make your life easier.
 
 The **"dot-key"** notation will be common in ***our learning process*** since it is one of the most used models in development today and one of the ***easiest to learn*** to use.
 
