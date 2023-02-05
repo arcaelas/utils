@@ -2,13 +2,13 @@ export * from './Errors'
 /**
  * Compare if Type is any Function Type
  */
-export type Noop = (...args: any[])=> any | Promise<any>
+export type Noop = (...args: any[]) => any | Promise<any>
 
 /**
  * Type for Object
  */
 export type IObject = {
-	[K: string]: any
+    [K: string | number | symbol]: any
 }
 
 
@@ -20,8 +20,8 @@ export type IObject = {
  * isObject(null) // false
  * isObject(new WebSocket(...)) // false
  */
-export function isObject(fn): fn is IObject {
-	return (fn?.__proto__?.constructor === Object)
+export function isObject(fn): boolean {
+    return typeof (fn ?? false) === 'object'
 }
 
 /**
@@ -38,8 +38,8 @@ export function isObject(fn): fn is IObject {
  * empty([ undefined ]) // false
  */
 export function empty<T extends any = any>(value: T): boolean {
-    return [undefined, null, false, 0].some(e=> e===value) ||
-        (['object', 'string'].some(e=> e===typeof value) && !Object.keys(value).length) ||
+    return [undefined, null, false, 0].some(e => e === value) ||
+        (['object', 'string'].some(e => e === typeof value) && !Object.keys(value).length) ||
         (Array.isArray(value) && !value.length);
 };
 
@@ -72,7 +72,7 @@ export function blank(arr): boolean {
  * }
  */
 export async function sleep(timeout = Infinity) {
-	await new Promise(r=> setTimeout(r, timeout))
+    await new Promise(r => setTimeout(r, timeout))
 }
 
 /**
@@ -81,8 +81,6 @@ export async function sleep(timeout = Infinity) {
 export function rand(min: number = -Infinity, max: number = Infinity): number {
     return Math.floor((Math.random() * (max - min + 1) + min));
 };
-
-
 
 /**
  * Get properties of object as path-key format
@@ -93,13 +91,13 @@ export function rand(min: number = -Infinity, max: number = Infinity): number {
  * @returns {string[]}
  */
 export function paths<T extends IObject = any>(o: T): string[] {
-    const c = (x, p = '', arr=[])=>{
-        for(let key in x){
-            let value = x[ key ];
-                key = p ? p+'.'+key : key;
-            if(value && typeof value==='object')
+    const c = (x, p = '', arr = []) => {
+        for (let key in x) {
+            let value = x[key];
+            key = p ? p + '.' + key : key;
+            if (value && typeof value === 'object')
                 c(value, key, arr);
-            else arr.push( key );
+            else arr.push(key);
         }
         return arr;
     };
@@ -118,17 +116,20 @@ export function paths<T extends IObject = any>(o: T): string[] {
  * set(props, 'c.d', 50)
  * props.c.d // 50
  */
-export function set<T = any>(target: T, path: string ='', value: any): T {
+export function set<T extends IObject = IObject>(target: T, path: string = '', value: any): T {
     let keys = path.split(".");
-    while(keys.length){
+    while (keys.length) {
         let key = keys.shift();
-        target = target[ key ] = !keys.length ? value : (
-            key in target ? (
-                target[key]&&typeof target[key]==='object'?target[key]:(
-                    keys.length ? {} : value
-                )
-            ):{}
-        );
+        Object.assign(target, {
+            [key]: !keys.length ? value : (
+                key in target ? (
+                    target[key] && typeof target[key] === 'object' ? target[key] : (
+                        keys.length ? {} : value
+                    )
+                ) : {}
+            )
+
+        })
     }
     return target;
 }
@@ -141,12 +142,12 @@ export function set<T = any>(target: T, path: string ='', value: any): T {
  * has(props, 'e') // false
  */
 export function has(object, path): boolean {
-	try {
-		return path.split('.').reduce((exists, key)=>key in exists && exists[ key ], object)
-	}
-	catch (err) {
-		return false
-	}
+    try {
+        return path.split('.').reduce((exists, key) => key in exists && exists[key], object)
+    }
+    catch (err) {
+        return false
+    }
 }
 
 /**
@@ -156,15 +157,15 @@ export function has(object, path): boolean {
  * get(props, 'a') // 1
  * get(props, 'c.d') // 3
  */
-export function get<T = any, D = any>(object: object, path = '', defaultValue?: D) : T | D {
-	try {
-		return path.split('.').reduce((obj, key) => {
-			return obj[key]
-		}, object)
-	}
-	catch (err) {
-		return defaultValue
-	}
+export function get<T = any, D = any>(object: object, path = '', defaultValue?: D): T | D {
+    try {
+        return path.split('.').reduce((obj, key) => {
+            return obj[key]
+        }, object)
+    }
+    catch (err) {
+        return defaultValue
+    }
 }
 
 /**
@@ -179,100 +180,89 @@ export function get<T = any, D = any>(object: object, path = '', defaultValue?: 
  * unset(props, 'c.d')
  * props.c // undefined
  */
-export function unset<T = any>(object: T, path=''): T {
-    let target, keys = path.split('.'), key = keys.shift();
-    if( keys.length === 0) delete object[ key ];
-    else if( key in object) {
-        target = object[ key ];
-        while(keys.length){
-            key = keys.shift();
-            if( target && typeof target==='object' && key in target ){
-                if( !keys.length){
-                    delete target[ key ];
-                    break;
-                } else target = target[ key ];
-            }
-            else break;
-        }
+export function unset<T extends IObject = IObject>(target: T, path = ''): T {
+    let object = target, keys = path.split('.')
+    while(keys.length){
+        const key = keys.shift()
+        if(!keys.length) delete object[ key ]
+        else if(typeof (object[ key ] ?? false) === 'object')
+            object = object[ key ]
+        else break
     }
-    return object;
+    return target
 };
 
-
-
-
-
-export interface Promify<S = any, E = any> extends Promise<any> {
-	status: 'pending' | 'filled' | 'failed'
-	resolve<O = S>(filled?: O): Promise<O>
-	reject<O = E>(filled?: O): Promise<O>
-	/**
+export interface Promify<S extends any = any, E extends any = any> extends Promise<S> {
+    status: 'pending' | 'filled' | 'failed'
+    resolve<O = S>(filled?: O): Promise<O>
+    reject<O = E>(filled?: O): Promise<O>
+    /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
      * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
      * @returns A Promise for the completion of the callback.
      */
-	finally(onfinally?: (() => void) | undefined | null): Promise<S>
+    finally(onfinally?: (() => void) | undefined | null): Promise<S>
 }
-export function promify<S = any, E = any>(): Promify<S, E> {
-	const status: any = { reject: Date.now, resolve: Date.now, }
-	const promise: any = new Promise((resolve, reject)=>Object.assign(status, { resolve, reject }))
-	promise.status = 'pending'
-	promise.reject = o=>{
-		status.reject(o as any)
-		promise.status = 'failed'
-		return promise
-	}
-	promise.resolve = o=>{
-		status.resolve(o as any)
-		promise.status = 'filled'
-		return promise
-	}
-	return promise as any
+export function promify<S extends any = any, E extends any = any>(): Promify<S, E> {
+    const status: any = { reject: Date.now, resolve: Date.now, }
+    const promise: any = new Promise((resolve, reject) => Object.assign(status, { resolve, reject }))
+    promise.status = 'pending'
+    promise.reject = o => {
+        status.reject(o as any)
+        promise.status = 'failed'
+        return promise
+    }
+    promise.resolve = o => {
+        status.resolve(o as any)
+        promise.status = 'filled'
+        return promise
+    }
+    return promise as any
 }
 
-export function clone<S=any>(object: S): S {
-	if( Array.isArray( object ) )
-		return object.map( clone ) as any
-	else if(isObject( object ))
-		return merge({}, object)
-	return object
+export function clone<S extends any = any>(object: S): S {
+    if (Array.isArray(object))
+        return object.map(clone) as any
+    else if (isObject(object))
+        return merge({}, object)
+    return object
 }
 
 export function merge(target: any, ...items: any[]): any {
-	target = isObject( target ) ? target : {}
-	for(const item of items){
-        if(!isObject( item )) continue
-		for(const key in item){
-			const value = item[ key ]
-			if(isObject(target[key]) && isObject( value ))
-				target[key] = merge(target[key], value)
-			else target[ key ] = value
-		}
-	}
-	return target
+    target = isObject(target) ? target : {}
+    for (const item of items) {
+        if (!isObject(item)) continue
+        for (const key in item) {
+            const value = item[key]
+            if (isObject(target[key]) && isObject(value))
+                target[key] = merge(target[key], value)
+            else target[key] = value
+        }
+    }
+    return target
 }
 
-export function mergeDiff(base, ...items){
-	base = isObject(base) ? base : {}
-	while(items.length){
-		const item = items.shift()
-		if(!isObject( item )) continue
-		for(const key in item){
-			const value = item[ key ]
-			if(key in base && isObject(value) && isObject(base[key])){
-				base[key] = mergeDiff(base[key], value)
-			}
-			else base[key] = value
-		}
-	}
-	return base
+export function mergeDiff(base, ...items) {
+    base = isObject(base) ? base : {}
+    while (items.length) {
+        const item = items.shift()
+        if (!isObject(item)) continue
+        for (const key in item) {
+            const value = item[key]
+            if (key in base && isObject(value) && isObject(base[key])) {
+                base[key] = mergeDiff(base[key], value)
+            }
+            else base[key] = value
+        }
+    }
+    return base
 }
 
-export function setcookie(name, ...props: [string, number, ...any]) : string {
-    return props.length ? cookie.set(name, ...props) : cookie.get( name ) as any;
+export function setcookie(name, ...props: [string, number, ...any]): string {
+    return props.length ? cookie.set(name, ...props) : cookie.get(name) as any;
 };
-export function unsetcookie(name) : boolean {
+export function unsetcookie(name): boolean {
     return cookie.remove(name);
 };
 const cookie = {
@@ -284,7 +274,7 @@ const cookie = {
         );
         return e = (time - now), e > 0 ? e : 0;
     },
-    set: function (name: string, value: string, time: number|string = Infinity, path?: string, domain?: string, https: boolean = false) : void | string {
+    set: function (name: string, value: string, time: number | string = Infinity, path?: string, domain?: string, https: boolean = false): void | string {
         return document.cookie =
             encodeURIComponent(name) +
             "=" + encodeURIComponent(value) +
@@ -296,11 +286,11 @@ const cookie = {
     get: function (name): string {
         return this.all[name] || undefined;
     },
-    remove: function (name, ...server) : boolean {
+    remove: function (name, ...server): boolean {
         return this.set(name, undefined, false, ...server), !this.all[name];
     },
     has: function (key): boolean {
-        return Object.keys(this.all).some(e=> e===key);
+        return Object.keys(this.all).some(e => e === key);
     },
     get all() {
         var cookies = [];
