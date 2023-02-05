@@ -16,9 +16,9 @@ jobs:
         run: npm i -g yarn typescript
       - name: Install local dependencies
         run: yarn
-      - name: TypeScript
-        run: tsc
+      - run: git config --global user.email "arcaela.reyes@gmail.com"
+      - run: git config --global user.name "Alejandro Reyes"
       - name: Publishing
-        run: npm publish
+        run: npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
