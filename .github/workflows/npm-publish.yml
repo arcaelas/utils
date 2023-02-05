@@ -24,10 +24,12 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: TypeScript
-        run: tsc
-      - name: Update Version
-        run: npm version minor
+      - name: Display
+        run: ls -la
+      # - name: TypeScript
+        # run: tsc
+      # - name: Update Version
+        # run: npm version minor
       - name: Packet Codes
         run: npm publish --access=public
         env: 
