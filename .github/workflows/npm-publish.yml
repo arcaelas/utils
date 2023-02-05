@@ -24,7 +24,11 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - name: TypeScript
+        run: tsc
+      - name: Update Version
+        run: npm version minor
       - name: Packet Codes
-        run: npm run commit
+        run: npm publish --access=public
         env: 
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
