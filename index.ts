@@ -265,6 +265,7 @@ export function setcookie(name, ...props: [string, number, ...any]): string {
 export function unsetcookie(name): boolean {
     return cookie.remove(name);
 };
+
 const cookie = {
     toSeconds: function (time = 3, e = 0) {
         time = empty(time) ? 0 : time;
