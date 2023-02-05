@@ -4,33 +4,21 @@ on:
     branches:
       - main
 jobs:
-  preparing:
+  publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Node.JS
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-  installing:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Global dependencies
+      - name: Install global dependencies
         run: npm i -g yarn typescript
-      - name: Install dependencies
+      - name: Install local dependencies
         run: yarn
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Display
-        run: ls -la
-      # - name: TypeScript
-        # run: tsc
-      # - name: Update Version
-        # run: npm version minor
-      - name: Packet Codes
-        run: npm publish --access=public
-        env: 
+      - name: TypeScript
+        run: tsc
+      - name: Publishing
+        run: npm publish
+        env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
