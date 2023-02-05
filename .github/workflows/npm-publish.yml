@@ -17,6 +17,9 @@ jobs:
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -25,6 +28,8 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: npm i -g yarn typescript
       - run: yarn
-      - run: npm publish --access=public
+      - run: tsc
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - run: rm -rf ./src ./lib
