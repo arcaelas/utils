@@ -1,7 +1,7 @@
 {
   "private": false,
   "license": "GNU",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "main": "lib/index.js",
   "name": "@arcaelas/utils",
   "description": "A small box of tools, which are implemented in different factions of the library.",
