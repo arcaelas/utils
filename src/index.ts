@@ -6,7 +6,7 @@ export type Noop<A = any, R = any> = (...args: A[]) => R | Promise<R>
 /**
  * Type for Object
  */
-export type IObject<T extends undefined = undefined> = {
+export type IObject<T = undefined> = {
     [K: string | number | symbol]: string | number | boolean | T | IObject<T> | IObject<T>[]
 }
 
