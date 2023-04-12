@@ -31,10 +31,5 @@
   "bugs": {
     "url": "https://github.com/arcaelas/command/issues"
   },
-  "homepage": "https://github.com/arcaelas/arcaelas#readme",
-  "devDependencies": {
-    "typedoc": "^0.23.19",
-    "typedoc-plugin-markdown": "^3.13.6",
-    "typescript": "^4.8.4"
-  }
+  "homepage": "https://github.com/arcaelas/arcaelas#readme"
 }
