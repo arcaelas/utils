@@ -1,19 +1,30 @@
 {
-  "private": false,
-  "license": "GNU",
+  "license": "ISC",
   "version": "1.24.0",
-  "main": "lib/index.js",
   "name": "@arcaelas/utils",
+  "main": "lib/index.js",
   "description": "A small box of tools, which are implemented in different factions of the library.",
+  "author": {
+    "name": "Arcaelas Insiders",
+    "email": "comunity@arcaelas.com",
+    "url": "https://github.com/arcaelas"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arcaelas/utils.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "bugs": {
+    "email": "community@arcaelas.com",
+    "url": "https://github.com/arcaelas/utils/issues"
+  },
   "scripts": {
     "start": "tsc --watch",
     "commit": "npm publish --access=public",
     "prepublishOnly": "tsc && npm version minor",
-    "postpublish": "rm -rf lib"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://github.com/arcaelas/utils.git"
+    "postpublish": "shx rm -rf lib"
   },
   "keywords": [
     "utils",
@@ -22,14 +33,5 @@
     "arcaelas insiders",
     "arcaelas-insiders",
     "javascript"
-  ],
-  "author": {
-    "name": "Arcaelas Insiders",
-    "email": "community@arcaelas.com",
-    "url": "https://github.com/arcaelas"
-  },
-  "bugs": {
-    "url": "https://github.com/arcaelas/command/issues"
-  },
-  "homepage": "https://github.com/arcaelas/arcaelas#readme"
+  ]
 }
