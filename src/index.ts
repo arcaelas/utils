@@ -1,24 +1,32 @@
 /**
+ * @description
  * Compare if Type is any Function Type
  */
 export type Noop<A = any, R = any> = (...args: A[]) => R | Promise<R>
 
 /**
+ * @description
  * Type for Object
  */
-export type IObject<T = undefined> = {
+export interface IObject<T = undefined> {
     [K: string | number | symbol]: string | number | boolean | T | IObject<T> | IObject<T>[]
 }
 
+/**
+ * @description
+ * Type for inmutables string, number, booleans
+*/
+export type Inmutables = Exclude<IObject[string], any[] | undefined | IObject>
 
 /**
+ * @description
  * Use this method to check if a value is an Plain Object
  * @example
  * isObject({}) // true
  * isObject([]) // false
  * isObject(null) // false
  * isObject(new WebSocket(...)) // false
- */
+*/
 export function isObject(fn): boolean {
     return typeof (fn ?? false) === 'object'
 }
@@ -35,7 +43,7 @@ export function isObject(fn): boolean {
  * empty([ null ]) // false
  * empty([ false ]) // false
  * empty([ undefined ]) // false
- */
+*/
 export function empty<T extends any = any>(value: T): boolean {
     return [undefined, null, false, 0].some(e => e === value) ||
         (['object', 'string'].some(e => e === typeof value) && !Object.keys(value).length) ||
@@ -51,7 +59,7 @@ export function empty<T extends any = any>(value: T): boolean {
  * blank(null) // true
  * blank('   ') // true
  * blank(undefined) // true
- */
+*/
 export function blank(arr): boolean {
     return (null ||
         arr === null ||
@@ -63,32 +71,35 @@ export function blank(arr): boolean {
 };
 
 /**
+ * @description
  * Use this method to supress process by a few time
  * @example
  * async function submit(form: HTMLFormElement){
  *  await sleep(3000)
  *  return form.submit()
  * }
- */
+*/
 export async function sleep(timeout = Infinity) {
     await new Promise(r => setTimeout(r, timeout))
 }
 
 /**
- * @description Get random number.
- */
+ * @description
+ * Get random number.
+*/
 export function rand(min: number = -Infinity, max: number = Infinity): number {
     return Math.floor((Math.random() * (max - min + 1) + min));
 };
 
 /**
+ * @description
  * Get properties of object as path-key format
  * @example
  * paths({ user:"arcaelas", "age": 25, job:{ home:"dream", school:"student", } })
  * // ['user','age','job.home', 'job.school']
  * @param {{}} object 
  * @returns {string[]}
- */
+*/
 export function paths<T extends IObject = any>(o: T): string[] {
     const c = (x, p = '', arr = []) => {
         for (let key in x) {
@@ -104,6 +115,7 @@ export function paths<T extends IObject = any>(o: T): string[] {
 };
 
 /**
+ * @description
  * Define any property in object, using path-key as key.
  * @example
  * const props = { a: 1, b: 2, c: { d: 3 } }
@@ -114,7 +126,7 @@ export function paths<T extends IObject = any>(o: T): string[] {
  * props.c.d // 3
  * set(props, 'c.d', 50)
  * props.c.d // 50
- */
+*/
 export function set<T extends IObject = IObject>(target: T, path: string = '', value: any): T {
     let keys = path.split(".");
     while (keys.length) {
@@ -134,12 +146,13 @@ export function set<T extends IObject = IObject>(target: T, path: string = '', v
 }
 
 /**
+ * @description
  * Check if a property is in object, using path-key as key.
  * @example
  * const props = { a: 1, b: 2, c: { d: 3 } }
  * has(props, 'a') // true
  * has(props, 'e') // false
- */
+*/
 export function has(object, path): boolean {
     try {
         return path.split('.').reduce((exists, key) => key in exists && exists[key], object)
@@ -150,12 +163,13 @@ export function has(object, path): boolean {
 }
 
 /**
+ * @description
  * Get any property from an object, using path-key as key.
  * @example
  * const props = { a: 1, b: 2, c: { d: 3 } }
  * get(props, 'a') // 1
  * get(props, 'c.d') // 3
- */
+*/
 export function get<T = any, D = any>(object: object, path = '', defaultValue?: D): T | D {
     try {
         return path.split('.').reduce((obj, key) => {
@@ -168,6 +182,7 @@ export function get<T = any, D = any>(object: object, path = '', defaultValue?: 
 }
 
 /**
+ * @description
  * Remove any property from an object, using path-key as key.
  * @example
  * const props = { a: 1, b: 2, c: { d: 3 } }
@@ -178,14 +193,14 @@ export function get<T = any, D = any>(object: object, path = '', defaultValue?: 
  * props.c // { d: 3 }
  * unset(props, 'c.d')
  * props.c // undefined
- */
+*/
 export function unset(target: IObject, path: string = ''): IObject {
     let object = target, keys = path.split('.')
-    while(keys.length){
+    while (keys.length) {
         const key = keys.shift()
-        if(!keys.length) delete object[ key ]
-        else if(typeof (object[ key ] ?? false) === 'object')
-            object = object[ key ] as IObject
+        if (!keys.length) delete object[key]
+        else if (typeof (object[key] ?? false) === 'object')
+            object = object[key] as IObject
         else break
     }
     return target
@@ -200,7 +215,7 @@ export interface Promify<S extends any = any, E extends any = any> extends Promi
      * resolved value cannot be modified from the callback.
      * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
      * @returns A Promise for the completion of the callback.
-     */
+    */
     finally(onfinally?: (() => void) | undefined | null): Promise<S>
 }
 export function promify<S extends any = any, E extends any = any>(): Promify<S, E> {
