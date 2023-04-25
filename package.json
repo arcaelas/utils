@@ -1,6 +1,6 @@
 {
   "license": "ISC",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "name": "@arcaelas/utils",
   "main": "lib/index.js",
   "description": "A small box of tools, which are implemented in different factions of the library.",
