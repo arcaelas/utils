@@ -1,5 +1,19 @@
 /**
  * @description
+ * Set self object for function
+ * @example
+ * const handler = function(this: Window, message: any){
+ *  this.console.log( message )
+ * }
+ * 
+ * const handler: Bind<Window, Noop<[ message: string ]>> = function(message: any){
+ *  this.console.log( message )
+ * }
+ */
+export type Bind<T extends any, H extends Noop> = (this: T, ...args: Parameters<H>) => ReturnType<H>
+
+/**
+ * @description
  * Compare if Type is any Function Type
  */
 export type Noop<A = any, R = any> = (...args: A[]) => R | Promise<R>
