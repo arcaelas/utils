@@ -16,7 +16,7 @@ export type Bind<T extends any, H extends Noop> = (this: T, ...args: Parameters<
  * @description
  * Compare if Type is any Function Type
  */
-export type Noop<A = any, R = any> = (...args: A[]) => R | Promise<R>
+export type Noop<A = any, R = any> = (...args: A extends any[] ? A : A[]) => R | Promise<R>
 
 /**
  * @description
