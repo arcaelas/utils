@@ -41,7 +41,7 @@ export type Inmutables = Exclude<IObject[string], any[] | undefined | IObject>
  * isObject(null) // false
  * isObject(new WebSocket(...)) // false
 */
-export function isObject(fn): boolean {
+export function isObject(fn): fn is IObject {
     return typeof (fn ?? false) === 'object'
 }
 
