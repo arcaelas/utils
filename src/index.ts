@@ -60,7 +60,7 @@ export function isObject(fn): fn is IObject {
 */
 export function empty<T extends any = any>(value: T): boolean {
     return [undefined, null, false, 0].some(e => e === value) ||
-        (['object', 'string'].some(e => e === typeof value) && !Object.keys(value).length) ||
+        (['object', 'string'].some(e => e === typeof value) && !Object.keys(value as any).length) ||
         (Array.isArray(value) && !value.length);
 };
 
@@ -115,7 +115,7 @@ export function rand(min: number = -Infinity, max: number = Infinity): number {
  * @returns {string[]}
 */
 export function paths<T extends IObject = any>(o: T): string[] {
-    const c = (x, p = '', arr = []) => {
+    const c = (x, p = '', arr: string[] = []) => {
         for (let key in x) {
             let value = x[key];
             key = p ? p + '.' + key : key;
@@ -144,7 +144,7 @@ export function paths<T extends IObject = any>(o: T): string[] {
 export function set<T extends IObject = IObject>(target: T, path: string = '', value: any): T {
     let keys = path.split(".");
     while (keys.length) {
-        let key = keys.shift();
+        let key = keys.shift() as string;
         Object.assign(target, {
             [key]: !keys.length ? value : (
                 key in target ? (
@@ -186,12 +186,10 @@ export function has(object, path): boolean {
 */
 export function get<T = any, D = any>(object: object, path = '', defaultValue?: D): T | D {
     try {
-        return path.split('.').reduce((obj, key) => {
-            return obj[key]
-        }, object)
+        return path.split('.').reduce((obj, key) => obj[key], object) as any
     }
     catch (err) {
-        return defaultValue
+        return defaultValue as D
     }
 }
 
@@ -211,7 +209,7 @@ export function get<T = any, D = any>(object: object, path = '', defaultValue?: 
 export function unset(target: IObject, path: string = ''): IObject {
     let object = target, keys = path.split('.')
     while (keys.length) {
-        const key = keys.shift()
+        const key = keys.shift() as string
         if (!keys.length) delete object[key]
         else if (typeof (object[key] ?? false) === 'object')
             object = object[key] as IObject
@@ -307,7 +305,7 @@ const cookie = {
         return document.cookie =
             encodeURIComponent(name) +
             "=" + encodeURIComponent(value) +
-            ("; max-age=" + this.toSeconds(time)) +
+            ("; max-age=" + this.toSeconds(time as number)) +
             (path ? "; path=" + path : "") +
             (domain ? "; domain=" + domain : "") +
             (https ? "; secure" : ""), value;
@@ -316,7 +314,7 @@ const cookie = {
         return this.all[name] || undefined;
     },
     remove: function (name, ...server): boolean {
-        return this.set(name, undefined, false, ...server), !this.all[name];
+        return this.set(name, undefined as any, undefined, ...server), !this.all[name];
     },
     has: function (key): boolean {
         return Object.keys(this.all).some(e => e === key);
