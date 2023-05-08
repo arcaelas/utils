@@ -16,5 +16,5 @@ build({
     bundle: false,
     minify: true,
     platform: "node",
-    format: "esm",
+    format: "cjs",
 })
