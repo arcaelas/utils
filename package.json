@@ -1,6 +1,6 @@
 {
   "license": "ISC",
-  "version": "1.45.6",
+  "version": "1.45.7",
   "name": "@arcaelas/utils",
   "homepage": "https://github.com/arcaelas/utils#readme",
   "description": "A small box of tools, which are implemented in different factions of the library.",
