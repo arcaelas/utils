@@ -1,7 +1,7 @@
 {
   "include": [
-    "src",
-    "lib"
+    "./src",
+    "./lib"
   ],
   "ts-node": {
     "esm": true,
