@@ -1,6 +1,6 @@
 {
   "license": "ISC",
-  "version": "1.33.0",
+  "version": "1.34.0",
   "name": "@arcaelas/utils",
   "description": "A small box of tools, which are implemented in different factions of the library.",
   "repository": {
