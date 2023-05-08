@@ -2,15 +2,8 @@
   "license": "ISC",
   "version": "1.34.0",
   "name": "@arcaelas/utils",
+  "homepage": "https://github.com/arcaelas/command#readme",
   "description": "A small box of tools, which are implemented in different factions of the library.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/arcaelas/utils.git"
-  },
-  "bugs": {
-    "email": "community@arcaelas.com",
-    "url": "https://github.com/arcaelas/utils/issues"
-  },
   "keywords": [
     "utils",
     "tools",
@@ -19,6 +12,14 @@
     "arcaelas-insiders",
     "javascript"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arcaelas/utils.git"
+  },
+  "bugs": {
+    "email": "community@arcaelas.com",
+    "url": "https://github.com/arcaelas/utils/issues"
+  },
   "main": "./lib/index.js",
   "exports": {
     "default": "./lib/index.js",
