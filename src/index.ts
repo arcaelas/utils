@@ -292,7 +292,7 @@ export function unsetcookie(name): boolean {
     return cookie.remove(name);
 };
 
-const cookie = {
+export const cookie = {
     toSeconds: function (time = 3, e = 0) {
         time = empty(time) ? 0 : time;
         let now = new Date().getTime();
