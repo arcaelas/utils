@@ -2,10 +2,19 @@
 const { build } = require("esbuild")
 
 build({
-    bundle: true,
+    entryPoints: ["test/index.test.ts"],
+    outdir: "test",
+    bundle: false,
     minify: true,
-    platform: "neutral",
-    alias: { "~": "src/" },
-    outfile: "lib/index.js",
+    platform: "node",
+    format: "cjs",
+})
+
+build({
     entryPoints: ["src/index.ts"],
+    outdir: "lib",
+    bundle: false,
+    minify: true,
+    platform: "node",
+    format: "esm",
 })

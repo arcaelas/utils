@@ -59,8 +59,8 @@ export function isObject(fn: any): fn is IObject {
  * empty([ undefined ]) // false
 */
 export function empty<T extends any = any>(value: T): boolean {
-    return [undefined, null, false, 0].some(e => e === value) ||
-        (['object', 'string'].some(e => e === typeof value) && !Object.keys(value as any).length) ||
+    return [undefined, null, false, 0].includes(value as any) ||
+        (['object', 'string'].includes(typeof value) && !Object.keys(value as any).length) ||
         (Array.isArray(value) && !value.length);
 };
 
@@ -169,7 +169,7 @@ export function set<T extends IObject = IObject>(target: T, path: string = '', v
 */
 export function has(object: IObject, path: string): boolean {
     try {
-        return path.split('.')
+        return !!path.split('.')
             .reduce((exists: IObject, key: string) => key in exists && exists[key] as any, object) as any
     }
     catch (err) {
