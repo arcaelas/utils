@@ -41,7 +41,7 @@ export type Inmutables = Exclude<IObject[string], any[] | undefined | IObject>
  * isObject(null) // false
  * isObject(new WebSocket(...)) // false
 */
-export function isObject(fn): fn is IObject {
+export function isObject(fn: any): fn is IObject {
     return typeof (fn ?? false) === 'object'
 }
 
@@ -74,7 +74,7 @@ export function empty<T extends any = any>(value: T): boolean {
  * blank('   ') // true
  * blank(undefined) // true
 */
-export function blank(arr): boolean {
+export function blank(arr: any): boolean {
     return (null ||
         arr === null ||
         arr === undefined ||
@@ -115,7 +115,7 @@ export function rand(min: number = -Infinity, max: number = Infinity): number {
  * @returns {string[]}
 */
 export function paths<T extends IObject = any>(o: T): string[] {
-    const c = (x, p = '', arr: string[] = []) => {
+    const c = (x: any, p = '', arr: string[] = []) => {
         for (let key in x) {
             let value = x[key];
             key = p ? p + '.' + key : key;
@@ -167,9 +167,10 @@ export function set<T extends IObject = IObject>(target: T, path: string = '', v
  * has(props, 'a') // true
  * has(props, 'e') // false
 */
-export function has(object, path): boolean {
+export function has(object: IObject, path: string): boolean {
     try {
-        return path.split('.').reduce((exists, key) => key in exists && exists[key], object)
+        return path.split('.')
+            .reduce((exists: IObject, key: string) => key in exists && exists[key] as any, object) as any
     }
     catch (err) {
         return false
@@ -186,7 +187,7 @@ export function has(object, path): boolean {
 */
 export function get<T = any, D = any>(object: object, path = '', defaultValue?: D): T | D {
     try {
-        return path.split('.').reduce((obj, key) => obj[key], object) as any
+        return path.split('.').reduce((obj: any, key: string) => obj[key], object) as any
     }
     catch (err) {
         return defaultValue as D
@@ -234,12 +235,12 @@ export function promify<S extends any = any, E extends any = any>(): Promify<S, 
     const status: any = { reject: Date.now, resolve: Date.now, }
     const promise: any = new Promise((resolve, reject) => Object.assign(status, { resolve, reject }))
     promise.status = 'pending'
-    promise.reject = o => {
+    promise.reject = (o: any) => {
         status.reject(o as any)
         promise.status = 'failed'
         return promise
     }
-    promise.resolve = o => {
+    promise.resolve = (o: any) => {
         status.resolve(o as any)
         promise.status = 'filled'
         return promise
@@ -269,7 +270,7 @@ export function merge(target: any, ...items: any[]): any {
     return target
 }
 
-export function mergeDiff(base, ...items) {
+export function mergeDiff(base: IObject, ...items: IObject[]) {
     base = isObject(base) ? base : {}
     while (items.length) {
         const item = items.shift()
@@ -277,7 +278,7 @@ export function mergeDiff(base, ...items) {
         for (const key in item) {
             const value = item[key]
             if (key in base && isObject(value) && isObject(base[key])) {
-                base[key] = mergeDiff(base[key], value)
+                base[key] = mergeDiff(base[key] as any, value)
             }
             else base[key] = value
         }
@@ -285,10 +286,10 @@ export function mergeDiff(base, ...items) {
     return base
 }
 
-export function setcookie(name, ...props: [string, number, ...any]): string {
+export function setcookie(name: string, ...props: [string, number, ...any]): string {
     return props.length ? cookie.set(name, ...props) : cookie.get(name) as any;
 };
-export function unsetcookie(name): boolean {
+export function unsetcookie(name: string): boolean {
     return cookie.remove(name);
 };
 
@@ -310,19 +311,19 @@ export const cookie = {
             (domain ? "; domain=" + domain : "") +
             (https ? "; secure" : ""), value;
     },
-    get: function (name): string {
-        return this.all[name] || undefined;
+    get: function (name: string): string {
+        return this.all[name as any] || undefined;
     },
-    remove: function (name, ...server): boolean {
-        return this.set(name, undefined as any, undefined, ...server), !this.all[name];
+    remove: function (name: string, ...server: any[]): boolean {
+        return this.set(name, undefined as any, undefined, ...server), !this.all[name as any];
     },
-    has: function (key): boolean {
+    has: function (key: string): boolean {
         return Object.keys(this.all).some(e => e === key);
     },
     get all() {
-        var cookies = [];
+        var cookies: any[] = [];
         return document.cookie.split(';').forEach(cookie => {
-            cookies[decodeURIComponent(cookie.substr(0, cookie.indexOf('='))).trim()] =
+            cookies[decodeURIComponent(cookie.substr(0, cookie.indexOf('='))).trim() as any] =
                 decodeURIComponent(cookie.substr(cookie.indexOf('=') + 1));
         }), cookies;
     }
