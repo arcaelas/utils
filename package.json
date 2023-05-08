@@ -43,5 +43,11 @@
     "commit": "npm publish --access=public",
     "prepublishOnly": "npm run build && npm version minor",
     "postpublish": "rm -rf lib"
+  },
+  "devDependencies": {
+    "@types/node": "^20.1.0",
+    "esbuild": "^0.17.18",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
   }
 }
