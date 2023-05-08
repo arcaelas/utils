@@ -26,11 +26,10 @@ build({
     format: "cjs",
 })
 
-
 // Test Files
 build({
     entryPoints: ["./test/index.test.ts"],
-    outfile: "./test/index.test.cjs",
+    outfile: "./test/index.test.js",
     bundle: false,
     minify: false,
     platform: "neutral",
@@ -39,15 +38,3 @@ build({
         naming('../lib'),
     ]
 })
-build({
-    entryPoints: ["./test/index.test.ts"],
-    outfile: "./test/index.test.mjs",
-    bundle: false,
-    minify: false,
-    platform: "neutral",
-    format: "esm",
-    plugins: [
-        naming('../lib'),
-    ]
-})
-
