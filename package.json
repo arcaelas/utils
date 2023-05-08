@@ -21,12 +21,6 @@
     "url": "https://github.com/arcaelas/utils/issues"
   },
   "main": "./lib/index.js",
-  "exports": {
-    "default": "./lib/index.js",
-    "import": "./lib/index.mjs",
-    "require": "./lib/index.cjs",
-    "types": "./lib/index.d.ts"
-  },
   "files": [
     "lib/",
     "*.md",
