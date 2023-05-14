@@ -22,7 +22,7 @@ export type Noop<A = any, R = any> = (...args: A extends any[] ? A : A[]) => R |
  * @description
  * Type for Object
  */
-interface IObject<T = undefined> {
+export interface IObject<T = undefined> {
     [K: string | number | symbol]:
     | string | number | boolean | bigint | T | IObject<T>
     | Array<string | number | boolean | bigint | T | IObject<T>>
