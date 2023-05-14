@@ -22,13 +22,15 @@ export type Noop<A = any, R = any> = (...args: A extends any[] ? A : A[]) => R |
  * @description
  * Type for Object
  */
-export interface IObject<T = undefined> {
-    [K: string | number | symbol]: string | number | boolean | T | IObject<T> | IObject<T>[]
+interface IObject<T = undefined> {
+    [K: string | number | symbol]:
+    | string | number | boolean | bigint | T | IObject<T>
+    | Array<string | number | boolean | bigint | T | IObject<T>>
 }
 
 /**
  * @description
- * Type for inmutables string, number, booleans
+ * Get only values number, string, bigint and booleans
 */
 export type Inmutables = Exclude<IObject[string], any[] | undefined | IObject>
 
@@ -278,7 +280,7 @@ export function mergeDiff(base: IObject, ...items: IObject[]) {
         for (const key in item) {
             const value = item[key]
             if (key in base && isObject(value) && isObject(base[key])) {
-                base[key] = mergeDiff(base[key] as any, value)
+                base[key] = mergeDiff(base[key] as IObject, value)
             }
             else base[key] = value
         }
