@@ -18,7 +18,7 @@ build({
     entryPoints: ['src/index.ts'],
     outdir: "build",
     sourcemap: true,
-    bundle: true,
+    bundle: false,
     minify: true,
     platform: "node",
     format: "cjs",
