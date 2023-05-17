@@ -1,4 +1,4 @@
-import { isObject, blank, clone, empty, get, has, paths, rand, sleep } from "../lib"
+import { isObject, blank, clone, empty, get, has, paths, rand, sleep } from "../src"
 
 test('isObject', () => {
     expect(isObject('')).toEqual(false)
