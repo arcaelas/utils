@@ -169,20 +169,32 @@ export function set<T extends IObject = IObject>(target: T, path: string = '', v
 
 /**
  * @description
- * Check if a property is in object, using path-key as key.
+ * Replaces the string properties of a template from an element.
  * @example
- * const props = { a: 1, b: 2, c: { d: 3 } }
- * has(props, 'a') // true
- * has(props, 'e') // false
-*/
-export function has(object: IObject, path: string): boolean {
-    try {
-        return !!path.split('.')
-            .reduce((exists: IObject, key: string) => key in exists && exists[key] as any, object) as any
+ * const schema = source({ github:"https://github.com/${username}" })
+ * 
+ * console.log( schema({ email:"community@arcaelas.com", username:"arcaelas" }) )
+ * // Output: { github:"https://github.com/arcaelas" }
+ */
+export function source<T extends IObject = IObject>(schema: T): (item: IObject) => T {
+    function map(object: any, ref: string = "", arr: any[] = []) {
+        for (const key in object) {
+            let _ref = (ref && ref + '.') + key
+            switch (typeof (object[key] ?? 0)) {
+                case 'string':
+                    arr.push(item => [
+                        _ref, String(schema[key]).replaceAll(/\$\{([^}]+)\}/g, (a, b) => get(item, b, ''))
+                    ])
+                    break
+                case 'object':
+                    arr = map(object[key], _ref, arr)
+                    break
+            }
+        }
+        return arr
     }
-    catch (err) {
-        return false
-    }
+    const setters = map(schema)
+    return item => setters.reduce((o, fn) => (set as Noop)(o, ...fn(item)), copy(schema))
 }
 
 /**
