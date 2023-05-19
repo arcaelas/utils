@@ -1,5 +1,11 @@
 /**
  * @description
+ * Create a type where only one prop is available
+ */
+export type OneOf<T> = { [K in keyof T]-?: Partial<Record<Exclude<keyof T, K>, never>> & Record<K, T[K]> }[keyof T]
+
+/**
+ * @description
  * Set self object for function
  * @example
  * const handler = function(this: Window, message: any){
