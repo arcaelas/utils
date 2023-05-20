@@ -126,24 +126,23 @@ export function rand(min: number = -Infinity, max: number = Infinity): number {
  * @description
  * Get properties of object as path-key format
  * @example
- * paths({ user:"arcaelas", "age": 25, job:{ home:"dream", school:"student", } })
+ * keys({ user:"arcaelas", "age": 25, job:{ home:"dream", school:"student", } })
  * // ['user','age','job.home', 'job.school']
  * @param {{}} object 
  * @returns {string[]}
 */
-export function paths<T extends IObject = any>(o: T): string[] {
-    const c = (x: any, p = '', arr: string[] = []) => {
-        for (let key in x) {
-            let value = x[key];
-            key = p ? p + '.' + key : key;
-            if (value && typeof value === 'object')
-                c(value, key, arr);
-            else arr.push(key);
+export function keys<T extends IObject = IObject>(object: T): Array<keyof T | string> {
+    function dd(o: any, p: string = '', a: string[] = []) {
+        for (const key in o) {
+            let path = (p && p + '.') + 'key'
+            if (typeof (o[key] ?? 0) === 'object')
+                a.push(...dd(o[key], path, a))
+            else a.push(path)
         }
-        return arr;
-    };
-    return c(o);
-};
+        return a
+    }
+    return dd(object)
+}
 
 /**
  * @description
