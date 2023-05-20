@@ -12,7 +12,7 @@ Let's start with the basic implementation steps.
 `yarn add --save @arcaelas/utils`
 
 ## Implementatión
-```javascript
+```ts
 // Import Statement
 import utils from '@arcaelas/utils'
 // or
@@ -24,20 +24,34 @@ import { someMethodName } from '@arcaelas/utils'
 const utils = require('@arcaelas/utils')
 ```
 
-### IsObject( value?: *any* ): *boolean*
-Use this method to check if a value is an Plain Object
-```javascript
-import { isObject } from '@arcaelas/utils'
+### blank( value?: *any* ): *boolean*
+"**Blank**" is a method to check if a value **is never** or **is empty** value.
+```ts
+import { blank } from '@arcaelas/utils'
 
-isObject({}) // => true
-isObject([]) // => false
-isObject(null) // => false
-isObject(new WebSocket(...)) // => false
+blank('') // true
+blank([]) // true
+blank({}) // true
+blank(null) // true
+blank(undefined) // true
+blank('   ') // true, because have only spaces.
+```
+
+### copy(object: any): *object*
+> This method superficially copies the properties of an object, this method is recommended only for flat objects;
+> Recursive objects or objects that have dependent properties such as Buffer, ArrayBuffer, Blob, File, etc;
+> They will be negatively affected.
+```ts
+const me = { id: 1, profile: { username:"arcaelas" } }
+const tmp = copy(me)
+tmp.profile.username = "insiders"
+console.log( me.profile.username ) // arcaelas
+console.log( tmp.profile.username ) // insiders
 ```
 
 ### empty( value?: *any* ): *boolean*
 Return **true** if value is **not empty**.
-```javascript
+```ts
 import { empty } from '@arcaelas/utils'
 
 empty(0)  // true
@@ -50,44 +64,8 @@ empty([ false ])  // false
 empty([ undefined ])  // false
 ```
 
-### blank( value?: *any* ): *boolean*
-"**Blank**" is a method to check if a value **is never** or **is empty** value.
-```javascript
-import { blank } from '@arcaelas/utils'
-
-blank('') // true
-blank([]) // true
-blank({}) // true
-blank(null) // true
-blank(undefined) // true
-blank('   ') // true, because have only spaces.
-```
-
-### sleep( ms: *number* ): *never*
-Use this method to **supress** process by a few time
-```javascript
-import { sleep } from '@arcaelas/utils'
-
-async function submit(form: HTMLFormElement){
- await sleep(3000)
- return form.submit()
-}
-```
-
-### rand( min: *number*, max?: *number* ): *number*
-Fast random number between range.
-
-```javascript
-import { rand } from '@arcaelas/utils'
-
-const fruits = ['apple', 'mango', 'banana']
-const randFruit = fruits[ rand(0, fruits.length - 1) ]
-// apple or mango or banana
-```
-
-### promify(): Promify
+### promify(): *Promify*
 With **promify** you can make a promise with custom handler easy, if you want create a promise and resolve outer promise you need **promify.**
-
 ```typescript
 import { readFile } from "fs"
 import { promify } from '@arcaelas/utils'
@@ -111,12 +89,65 @@ readFile(__dirname + "/myfile.md", "utf-8", (err, data)=>{
 })
 ```
 
+### rand( min: *number*, max?: *number* ): *number*
+Fast random number between range.
+```ts
+import { rand } from '@arcaelas/utils'
+
+const fruits = ['apple', 'mango', 'banana']
+const randFruit = fruits[ rand(0, fruits.length - 1) ]
+// apple or mango or banana
+```
+
+### sleep( ms: *number* ): *never*
+Use this method to **supress** process by a few time
+```ts
+import { sleep } from '@arcaelas/utils'
+
+async function submit(form: HTMLFormElement){
+ await sleep(3000)
+ return form.submit()
+}
+```
+
+### source(schema: *object*): *fn*
+> Replaces the string properties of a template from an element.
+```ts
+const schema = source({ github:"https://github.com/${username}" })
+console.log( schema({ email:"community@arcaelas.com", username:"arcaelas" }) )
+	// Output: { github:"https://github.com/arcaelas" }
+```
+
+### query
+> Create query handlers that allow you to compare objects
+> There are built-in methods that you will find useful, but they can be overridden if you specify them when creating a new handler.
+```ts
+@example
+// Create filter with custom handlers
+const filter = query({
+ $isPast(ref: string, value: boolean, item: IObject){
+	 let past = new Date(get(item, ref)) < value // Check if field is less than value
+     return value ? past : !past // If value is "true", return true when date is outdate.
+ }
+})
+
+// Create a function that allows you to compare the elements, based on the handlers already defined.
+const match = filter({
+	expireAt: {
+		$isPast: true
+ }
+})
+
+// We filter the elements that have the field "expireAt" in the past.
+const offline = items.filter(item=> match( item ))
+```
+
 ### setcookie( name: *string*, value?: *any*, exp?: *number*, path?: *string*, domain?: string, https?: *boolean* ): *any*
 In front-end, you need store cookies some times.
 **setcookie** help you to make this possible.
 
 Let's imagine you have a login function and you want to save the result in a cookie.
-```javascript
+```ts
 import { setcookie } from '@arcaelas/utils'
 
 
@@ -133,12 +164,12 @@ function SignIn(email, password){
 }
 ```
 We can also specify from which route our cookie is available within our domain.
-```javascript
+```ts
 // Cookie with name "key" is only available when our site is in "/shop" page.
 setcookie("key", "value", "expireTime in ms", "/shop")
 ```
 We keep in mind that all the **cookies** that are defined in our application are **available only in our domain name** where they are defined, but sometimes we want to define them for **another domain name**.
-```javascript
+```ts
 // For domain http://example.com
 setcookie("key", "value", 3600 * 1000)
 // Only available in example.com, if you navigate to app.example.com, cookie does not available there.
@@ -153,7 +184,7 @@ setcookie("key", "value", 3600 * 1000, "shop.example.com")
 ```
 #### Reading Cookie
 To read cookie value, you need call **setcookie** method with just cookie **name**.
-```javascript
+```ts
 const fetch(..., {
 	headers: {
 		authentication: "Bearer " + setcookie("accessToken")
@@ -164,7 +195,7 @@ const fetch(..., {
 ### unsetcookie( name: *string* ): *boolean*
 Above we have learned how to **define a cookie** in our **application**, but there is another activity to do and that is: *How do we delete a cookie **without waiting for the expiration time**?*
 
-```javascript
+```ts
 import { unsetcookie } from '@arcaelas/utils'
 
 function SignOut(){
@@ -179,58 +210,9 @@ function SignOut(){
 
 The **"dot-key"** notation will be common in ***our learning process*** since it is one of the most used models in development today and one of the ***easiest to learn*** to use.
 
-### paths(o: *object*): *string*[]
-With this method you can **extract** an **array** with **all properties name** as **dot-key** notation in **object**.
-```javascript
-import { paths } from "@arcaelas/utils"
-const profile = {
-	name: "Arcaelas Insiders",
-	email: "example@arcaelas.com",
-	skills:{
-		frontEnd: "23 years",
-		backEnd: "19 years"
-	}
-}
-paths(profile) // ["name", "email", "skills.frontEnd", "skills.backEnd"]
-```
-
-### set(o: *object*, path: *string*, value: *any* ): *any*
-With the **"set"** method it will be **easy to define a value** to a property in our **object recursively**, *without having to manually* access its properties from our development logic.
-```javascript
-import { set } from "@arcaelas/utils"
-const profile = {
-	name: "Arcaelas Insiders",
-	email: "example@arcaelas.com",
-	skills:{
-		frontEnd: "23 years",
-		backEnd: "19 years"
-	}
-}
-console.log(profile.skills)
-// Expected: { frontEnd: ... , backEnd: ... }
-set(profile, "skills.server", "8 years")
-console.log(profile.skills.server) // Expected: 8 years
-```
-
-### has( o: *object*, path: *string* ): boolean
-Once we have defined *our object*, we may need to know if a property exists on it, regardless of **whether it is empty or null**.
-```javascript
-import { has } from "@arcaelas/utils"
-const profile = {
-	name: "Arcaelas Insiders",
-	email: "example@arcaelas.com",
-	skills:{
-		frontEnd: "23 years",
-		backEnd: "19 years"
-	}
-}
-has(profile, "name") // true
-has(profile, "skills.server") // false
-```
-
 ### get(o: *object*, path: *string*, default: *any*): *any*
 Above we have explained how to *define* and *verify* a property inside our object, but it is useless if we cannot obtain its value.
-```javascript
+```ts
 import { get } from '@arcaelas/utils'
 
 const profile = {
@@ -246,9 +228,61 @@ get(profile, "skills.frontEnd") // 23 years
 get(profile, "skills.server", "defaultValue") // defaultValue
 ```
 
+### has( o: *object*, path: *string* ): *boolean*
+Once we have defined *our object*, we may need to know if a property exists on it, regardless of **whether it is empty or null**.
+```ts
+import { has } from "@arcaelas/utils"
+const profile = {
+	name: "Arcaelas Insiders",
+	email: "example@arcaelas.com",
+	skills:{
+		frontEnd: "23 years",
+		backEnd: "19 years"
+	}
+}
+has(profile, "name") // true
+has(profile, "skills.server") // false
+```
+
+### keys(o: *object*): *string[]*
+With this method you can **extract** an **array** with **all properties name** as **dot-key** notation in **object**.
+```ts
+import { keys } from "@arcaelas/utils"
+const profile = {
+	name: "Arcaelas Insiders",
+	email: "example@arcaelas.com",
+	skills:{
+		frontEnd: "23 years",
+		backEnd: "19 years"
+	}
+}
+keys(profile) // ["name", "email", "skills.frontEnd", "skills.backEnd"]
+```
+
+### merge(target: *object*, ...objects: *object[]*): *target*
+> Mixes properties to a target object, mutating its initial structure.
+
+### set(o: *object*, path: *string*, value: *any* ): *any*
+With the **"set"** method it will be **easy to define a value** to a property in our **object recursively**, *without having to manually* access its properties from our development logic.
+```ts
+import { set } from "@arcaelas/utils"
+const profile = {
+	name: "Arcaelas Insiders",
+	email: "example@arcaelas.com",
+	skills:{
+		frontEnd: "23 years",
+		backEnd: "19 years"
+	}
+}
+console.log(profile.skills)
+// Expected: { frontEnd: ... , backEnd: ... }
+set(profile, "skills.server", "8 years")
+console.log(profile.skills.server) // Expected: 8 years
+```
+
 ### unset( o: *object*, path: *string* ): *boolean*
 Of course, the method responsible for **removing some property** in our object could not be missing.
-```javascript
+```ts
 import { unset } from '@arcaelas/utils'
 
 const profile = {
