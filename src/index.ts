@@ -152,19 +152,6 @@ export function has(object: IObject, path: string): boolean {
 
 /**
  * @description
- * Use this method to check if a value is an Plain Object
- * @example
- * isObject({}) // true
- * isObject([]) // false
- * isObject(null) // false
- * isObject(new WebSocket(...)) // false
-*/
-export function isObject(fn: any): fn is IObject {
-    return typeof (fn ?? false) === 'object'
-}
-
-/**
- * @description
  * Get properties of object as path-key format
  * @example
  * keys({ user:"arcaelas", "age": 25, job:{ home:"dream", school:"student", } })
@@ -192,12 +179,12 @@ export function keys<T extends IObject = IObject>(object: T): Array<keyof T | st
  * Use only with flat objects.
  */
 export function merge(target: any, ...items: any[]): any {
-    target = isObject(target) ? target : {}
+    target = typeof (target ?? 0) === 'object' ? target : {}
     for (const item of items) {
-        if (!isObject(item)) continue
+        if (typeof (item ?? 0) !== 'object') continue
         for (const key in item) {
             const value = item[key]
-            if (isObject(target[key]) && isObject(value))
+            if (typeof (target[key] ?? 0) === 'object' && typeof (value ?? 0) === 'object')
                 target[key] = merge(target[key], value)
             else target[key] = value
         }
@@ -211,14 +198,14 @@ export function merge(target: any, ...items: any[]): any {
  * Merges only the properties that are different from the initial object.
  */
 export function mergeDiff(base: IObject, ...items: IObject[]) {
-    base = isObject(base) ? base : {}
+    base = typeof (base ?? 0) === 'object' ? base : {}
     while (items.length) {
         const item = items.shift()
-        if (!isObject(item)) continue
+        if (typeof (item ?? 0) !== 'object') continue
         for (const key in item) {
             const value = item[key]
-            if (key in base && isObject(value) && isObject(base[key])) {
-                base[key] = mergeDiff(base[key] as IObject, value)
+            if (key in base && typeof (value ?? 0) === 'object' && typeof (base[key] ?? 0) === 'object') {
+                base[key] = mergeDiff(base[key] as IObject, value as IObject)
             }
             else base[key] = value
         }
@@ -325,8 +312,6 @@ export function source<T extends IObject = IObject>(schema: T): (item: IObject) 
     return item => setters.reduce((o, fn) => (set as Noop)(o, ...fn(item)), copy(schema))
 }
 
-
-
 export interface QueryTypes {
     /**
      * @description
@@ -396,7 +381,6 @@ export interface QueryTypes {
 export type Query<I = QueryTypes, T = NonNullable<I> & QueryTypes> = { [K in keyof T]?: never } & {
     [K in string]-?: Inmutables | RegExp | Query<T> | OneOf<T>
 }
-
 
 /**
  * @description
