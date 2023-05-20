@@ -162,7 +162,7 @@ export function has(object: IObject, path: string): boolean {
 export function keys<T extends IObject = IObject>(object: T): Array<keyof T | string> {
     function dd(o: any, p: string = '', a: string[] = []) {
         for (const key in o) {
-            let path = (p && p + '.') + 'key'
+            let path = (p && p + '.') + key
             if (typeof (o[key] ?? 0) === 'object')
                 a.push(...dd(o[key], path, a))
             else a.push(path)
