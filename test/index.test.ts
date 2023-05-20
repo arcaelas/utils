@@ -31,6 +31,7 @@ test('rand', () => {
 
 test('keys', () => {
     const _paths = keys({ a: 1, b: { c: 3 } }) as string[]
+    console.log(_paths)
     expect(
         _paths.every(e => ['a', 'b.c'].includes(e))
     ).toEqual(true)
