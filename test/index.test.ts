@@ -1,13 +1,5 @@
-import { isObject, blank, clone, empty, get, has, paths, rand, sleep } from "../src"
+import { blank, copy, empty, get, has, keys, rand, sleep } from "../src"
 
-test('isObject', () => {
-    expect(isObject('')).toEqual(false)
-    expect(isObject([])).toEqual(true)
-    expect(isObject({})).toEqual(true)
-    expect(isObject(null)).toEqual(false)
-    expect(isObject('   ')).toEqual(false)
-    expect(isObject(undefined)).toEqual(false)
-})
 
 test('empty', () => {
     expect(empty(0)).toEqual(true)
@@ -37,8 +29,8 @@ test('rand', () => {
         .toBeLessThan(4)
 })
 
-test('paths', () => {
-    const _paths = paths({ a: 1, b: { c: 3 } }) as string[]
+test('keys', () => {
+    const _paths = keys({ a: 1, b: { c: 3 } }) as string[]
     expect(
         _paths.every(e => ['a', 'b.c'].includes(e))
     ).toEqual(true)
@@ -56,10 +48,10 @@ test('get', () => {
     ).toEqual(3)
 })
 
-test('clone', () => {
+test('copy', () => {
     const el = { a: 1, b: { c: 3 } }
-    const copy = clone(el)
-    expect(el === copy).toEqual(false)
-    expect(el !== copy).toEqual(true)
-    expect(el).toMatchObject(copy)
+    const _copy = copy(el)
+    expect(el === _copy).toEqual(false)
+    expect(el !== _copy).toEqual(true)
+    expect(el).toMatchObject(_copy)
 })
