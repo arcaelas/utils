@@ -421,10 +421,12 @@ export function query(methods: any) {
                 if (!pattern) throw new ReferenceError(`RegExp with syntax: ${value}`)
                 value = { $exp: { pattern, flags } }
             }
-            if (key in handlers)
-                arr.push(handlers[key](_ref, value))
+            if (key in handlers) {
+                arr.push(handlers[key](ref, value))
+                break
+            }
             else if (typeof (value ?? false) === 'object')
-                arr = arr.concat(make(value, key, handlers)) as any[]
+                arr = arr.concat(make(value, _ref, handlers)) as any[]
             else
                 arr.push(handlers.$eq(_ref, value))
         }
