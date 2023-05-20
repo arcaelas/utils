@@ -199,6 +199,77 @@ export function source<T extends IObject = IObject>(schema: T): (item: IObject) 
 
 
 
+export interface QueryTypes {
+    /**
+     * @description
+     * The $eq operator matches documents where the value of a field equals the specified value.
+     * @example
+     * {
+     *  age: 18
+     * }
+     * @example
+     * {
+     *  age: {
+     *      $eq: 18
+     *  } 
+     * }
+     */
+    $eq: Inmutables
+    /**
+     * @description
+     * Check if document have a field specified.
+     */
+    $exists: boolean
+    /**
+     * @description
+     * Matches documents where field value is matched with RegExp or RegExp ON (RegExp Object Notation)
+     */
+    $exp: RegExp | { pattern: string, flags?: string }
+    /**
+     * @description
+     * Verify if field value is greater than (i.e. >) the specified value.
+     */
+    $gt: number
+    /**
+     * @description
+     * Verify if field value is greater than or equal (i.e. >=) the specified value.
+     */
+    $gte: number
+    /**
+     * @description
+     * Use $in operator to validate if field value exist in a specific array element
+     */
+    $in: Inmutables[]
+    /**
+     * @description
+     * Check if field value contain a value specified
+     */
+    $includes: Inmutables
+    /**
+     * @description
+     * Verify if field value is less than (i.e. <) the specified value.
+     */
+    $lt: number
+    /**
+     * @description
+     * Verify if field value is less than or equal (i.e. <=) the specified value.
+     */
+    $lte: number
+    /**
+     * @description
+     * The $not operator matches documents where the value of a field not equals the specified value.
+     * @example
+     * { $not: { age: 18 } }
+     * { age: { $not: 18 } }
+     * { age: { $not: { $eq: 18 } } }
+     */
+    $not: Inmutables | RegExp | OneOf<Omit<QueryTypes, '$not'>>
+}
+export type Query<I = QueryTypes, T = NonNullable<I> & QueryTypes> = { [K in keyof T]?: never } & {
+    [K in string]-?: Inmutables | RegExp | Query<T> | OneOf<T>
+}
+
+
 /**
  * @description
  * Create query handlers that allow you to compare objects
