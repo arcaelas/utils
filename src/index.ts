@@ -20,9 +20,9 @@ export type Bind<T extends any, H extends Noop> = (this: T, ...args: Parameters<
 
 /**
  * @description
- * Compare if Type is any Function Type
- */
-export type Noop<A = any, R = any> = (...args: A extends any[] ? A : A[]) => R | Promise<R>
+ * Get only values number, string, bigint and booleans
+*/
+export type Inmutables = Exclude<IObject[string], any[] | undefined | IObject>
 
 /**
  * @description
@@ -36,9 +36,42 @@ export interface IObject<T = undefined> {
 
 /**
  * @description
- * Get only values number, string, bigint and booleans
+ * Compare if Type is any Function Type
+ */
+export type Noop<A = any, R = any> = (...args: A extends any[] ? A : A[]) => R | Promise<R>
+
+export interface Promify<S extends any = any, E extends any = any> extends Promise<S> {
+    status: 'pending' | 'filled' | 'failed'
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+    */
+    finally(onfinally?: (() => void) | undefined | null): Promise<S>
+    reject<O = E>(filled?: O): Promise<O>
+    resolve<O = S>(filled?: O): Promise<O>
+}
+
+/**
+ * @description "Blank" is a method to check if a value is never or is empty value.
+ * @example
+ * blank('') // true
+ * blank([]) // true
+ * blank({}) // true
+ * blank(null) // true
+ * blank('   ') // true
+ * blank(undefined) // true
 */
-export type Inmutables = Exclude<IObject[string], any[] | undefined | IObject>
+export function blank(arr: any): boolean {
+    return (null ||
+        arr === null ||
+        arr === undefined ||
+        (Array.isArray(arr) && !arr.length) ||
+        (typeof arr === 'string' && arr.trim().length == 0) ||
+        (arr && typeof arr === 'object' && !Object.keys(arr).length)
+    );
+};
 
 /**
  * @description
@@ -82,45 +115,53 @@ export function empty<T extends any = any>(value: T): boolean {
 };
 
 /**
- * @description "Blank" is a method to check if a value is never or is empty value.
- * @example
- * blank('') // true
- * blank([]) // true
- * blank({}) // true
- * blank(null) // true
- * blank('   ') // true
- * blank(undefined) // true
-*/
-export function blank(arr: any): boolean {
-    return (null ||
-        arr === null ||
-        arr === undefined ||
-        (Array.isArray(arr) && !arr.length) ||
-        (typeof arr === 'string' && arr.trim().length == 0) ||
-        (arr && typeof arr === 'object' && !Object.keys(arr).length)
-    );
-};
-
-/**
  * @description
- * Use this method to supress process by a few time
+ * Get any property from an object, using path-key as key.
  * @example
- * async function submit(form: HTMLFormElement){
- *  await sleep(3000)
- *  return form.submit()
- * }
+ * const props = { a: 1, b: 2, c: { d: 3 } }
+ * get(props, 'a') // 1
+ * get(props, 'c.d') // 3
 */
-export async function sleep(timeout = Infinity) {
-    await new Promise(r => setTimeout(r, timeout))
+export function get<T = any, D = any>(object: object, path = '', defaultValue?: D): T | D {
+    try {
+        return path.split('.').reduce((obj: any, key: string) => obj[key], object) as any
+    }
+    catch (err) {
+        return defaultValue as D
+    }
 }
 
 /**
  * @description
- * Get random number.
+ * Check if a property is in object, using path-key as key.
+ * @example
+ * const props = { a: 1, b: 2, c: { d: 3 } }
+ * has(props, 'a') // true
+ * has(props, 'e') // false
 */
-export function rand(min: number = -Infinity, max: number = Infinity): number {
-    return Math.floor((Math.random() * (max - min + 1) + min));
-};
+export function has(object: IObject, path: string): boolean {
+    try {
+        path.split('.')
+            .reduce((o, k) => k in o ? o[k] : null, object as any)
+        return true
+    }
+    catch (err) {
+        return false
+    }
+}
+
+/**
+ * @description
+ * Use this method to check if a value is an Plain Object
+ * @example
+ * isObject({}) // true
+ * isObject([]) // false
+ * isObject(null) // false
+ * isObject(new WebSocket(...)) // false
+*/
+export function isObject(fn: any): fn is IObject {
+    return typeof (fn ?? false) === 'object'
+}
 
 /**
  * @description
@@ -142,6 +183,85 @@ export function keys<T extends IObject = IObject>(object: T): Array<keyof T | st
         return a
     }
     return dd(object)
+}
+
+/**
+ * @description
+ * Mixes properties to a target object, mutating its initial structure.
+ * @description
+ * Use only with flat objects.
+ */
+export function merge(target: any, ...items: any[]): any {
+    target = isObject(target) ? target : {}
+    for (const item of items) {
+        if (!isObject(item)) continue
+        for (const key in item) {
+            const value = item[key]
+            if (isObject(target[key]) && isObject(value))
+                target[key] = merge(target[key], value)
+            else target[key] = value
+        }
+    }
+    return target
+}
+
+/**
+ * @deprecated
+ * @description
+ * Merges only the properties that are different from the initial object.
+ */
+export function mergeDiff(base: IObject, ...items: IObject[]) {
+    base = isObject(base) ? base : {}
+    while (items.length) {
+        const item = items.shift()
+        if (!isObject(item)) continue
+        for (const key in item) {
+            const value = item[key]
+            if (key in base && isObject(value) && isObject(base[key])) {
+                base[key] = mergeDiff(base[key] as IObject, value)
+            }
+            else base[key] = value
+        }
+    }
+    return base
+}
+
+export function promify<S extends any = any, E extends any = any>(): Promify<S, E> {
+    const status: any = { reject: Date.now, resolve: Date.now, }
+    const promise: any = new Promise((resolve, reject) => Object.assign(status, { resolve, reject }))
+    promise.status = 'pending'
+    promise.reject = (o: any) => {
+        status.reject(o as any)
+        promise.status = 'failed'
+        return promise
+    }
+    promise.resolve = (o: any) => {
+        status.resolve(o as any)
+        promise.status = 'filled'
+        return promise
+    }
+    return promise as any
+}
+
+/**
+ * @description
+ * Get random number.
+*/
+export function rand(min: number = -Infinity, max: number = Infinity): number {
+    return Math.floor((Math.random() * (max - min + 1) + min));
+};
+
+/**
+ * @description
+ * Use this method to supress process by a few time
+ * @example
+ * async function submit(form: HTMLFormElement){
+ *  await sleep(3000)
+ *  return form.submit()
+ * }
+*/
+export async function sleep(timeout = Infinity) {
+    await new Promise(r => setTimeout(r, timeout))
 }
 
 /**
@@ -405,73 +525,6 @@ export function unset(target: IObject, path: string = ''): IObject {
     }
     return target
 };
-
-export interface Promify<S extends any = any, E extends any = any> extends Promise<S> {
-    status: 'pending' | 'filled' | 'failed'
-    resolve<O = S>(filled?: O): Promise<O>
-    reject<O = E>(filled?: O): Promise<O>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-    */
-    finally(onfinally?: (() => void) | undefined | null): Promise<S>
-}
-export function promify<S extends any = any, E extends any = any>(): Promify<S, E> {
-    const status: any = { reject: Date.now, resolve: Date.now, }
-    const promise: any = new Promise((resolve, reject) => Object.assign(status, { resolve, reject }))
-    promise.status = 'pending'
-    promise.reject = (o: any) => {
-        status.reject(o as any)
-        promise.status = 'failed'
-        return promise
-    }
-    promise.resolve = (o: any) => {
-        status.resolve(o as any)
-        promise.status = 'filled'
-        return promise
-    }
-    return promise as any
-}
-
-export function clone<S extends any = any>(object: S): S {
-    if (Array.isArray(object))
-        return object.map(clone) as any
-    else if (isObject(object))
-        return merge({}, object)
-    return object
-}
-
-export function merge(target: any, ...items: any[]): any {
-    target = isObject(target) ? target : {}
-    for (const item of items) {
-        if (!isObject(item)) continue
-        for (const key in item) {
-            const value = item[key]
-            if (isObject(target[key]) && isObject(value))
-                target[key] = merge(target[key], value)
-            else target[key] = value
-        }
-    }
-    return target
-}
-
-export function mergeDiff(base: IObject, ...items: IObject[]) {
-    base = isObject(base) ? base : {}
-    while (items.length) {
-        const item = items.shift()
-        if (!isObject(item)) continue
-        for (const key in item) {
-            const value = item[key]
-            if (key in base && isObject(value) && isObject(base[key])) {
-                base[key] = mergeDiff(base[key] as IObject, value)
-            }
-            else base[key] = value
-        }
-    }
-    return base
-}
 
 export function setcookie(name: string, ...props: [string, number, ...any]): string {
     return props.length ? cookie.set(name, ...props) : cookie.get(name) as any;
