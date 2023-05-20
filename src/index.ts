@@ -432,6 +432,13 @@ export function query(methods: any) {
         }
         return arr
     }
+    function build(query: any) {
+        const arr = make(query, '', { ...native, ...methods })
+        return function match(item: any) {
+            return arr.every(fn => fn(item))
+        }
+    }
+
     const native = {
         $eq(ref: string, value: any) {
             return (item: any) => get(item, ref) === value
@@ -472,19 +479,13 @@ export function query(methods: any) {
             return (item: any) => get(item, ref, 0) <= Number(value)
         },
         $not(ref: string, value: any) {
-            // value = typeof (value??0)==='object' ? ()=>filter()
-            // value = value instanceof QueryConstructor ? value : (
-            //     typeof (value ?? 0) === 'object' ? new QueryConstructor(value as Query, ref) : value
-            // ) as Inmutables
-            // return (item: any) => !(value instanceof QueryConstructor ? value(item) : get(item, ref) === value)
+            value = typeof (value ?? 0) === 'object' ? build(value) : (
+                typeof value === 'function' ? value : i => get(i, ref, null) === value
+            )
+            return (item: any) => !value(item)
         },
     }
-    return function build(query: any) {
-        const arr = make(query, '', { ...native, ...methods })
-        return function match(item: any) {
-            return arr.every(fn => fn(item))
-        }
-    }
+    return build
 }
 
 /**
