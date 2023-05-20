@@ -197,20 +197,108 @@ export function source<T extends IObject = IObject>(schema: T): (item: IObject) 
     return item => setters.reduce((o, fn) => (set as Noop)(o, ...fn(item)), copy(schema))
 }
 
+
+
 /**
  * @description
- * Get any property from an object, using path-key as key.
+ * Create query handlers that allow you to compare objects
+ * @description
+ * There are built-in methods that you will find useful,
+ * but they can be overridden if you specify them when creating a new handler.
  * @example
- * const props = { a: 1, b: 2, c: { d: 3 } }
- * get(props, 'a') // 1
- * get(props, 'c.d') // 3
-*/
-export function get<T = any, D = any>(object: object, path = '', defaultValue?: D): T | D {
-    try {
-        return path.split('.').reduce((obj: any, key: string) => obj[key], object) as any
+ * // Create filter with custom handlers
+ * const filter = query({
+ *  $isPast(ref: string, value: boolean, item: IObject){
+ *      let past = new Date(get(item, ref)) < value // Check if field is less than value
+ *      return value ? past : !past // If value is "true", return true when date is outdate.
+ *  }
+ * })
+ * 
+ * // Create a function that allows you to compare the elements, based on the handlers already defined.
+ * const match = filter({
+ *  expireAt: {
+ *      $isPast: true
+ *  }
+ * })
+ * 
+ * // We filter the elements that have the field "expireAt" in the past.
+ * const offline = items.filter(item=> match( item ))
+ * 
+ */
+export function query<T>(methods?: T):
+    (query: Query<T>) =>
+        <I extends IObject>(item: I) => boolean;
+export function query(methods: any) {
+    function make(query: Query, ref: string, handlers: any) {
+        let arr: any[] = []
+        for (const key in query) {
+            let _ref = (ref && ref + '.') + key, value = query[key] as any
+            if (value instanceof RegExp) {
+                const [, pattern, flags = ''] = String(value).match(/^(.*)?\/([a-z]+)?$/) || []
+                if (!pattern) throw new ReferenceError(`RegExp with syntax: ${value}`)
+                value = { $exp: { pattern, flags } }
+            }
+            if (key in handlers)
+                arr.push(handlers[key](_ref, value))
+            else if (typeof (value ?? false) === 'object')
+                arr = arr.concat(make(value, _ref, handlers)) as any[]
+            else
+                arr.push(handlers.$eq(_ref, value))
+        }
+        return arr
     }
-    catch (err) {
-        return defaultValue as D
+    const native = {
+        $eq(ref: string, value: any) {
+            return (item: any) => get(item, ref) === value
+        },
+        $exists(ref: string, value: any) {
+            return (item: any) => has(item, ref) === value
+        },
+        $exp(ref: string, value: any) {
+            if (!(value instanceof RegExp)) {
+                if (value.pattern) value = new RegExp(value.pattern, value.flags ?? '')
+                else {
+                    const [, pattern, flags = ''] = String(value).match(/^(.*)?\/([a-z]+)?$/) || []
+                    if (!pattern) throw new ReferenceError(`ErrorType: RegExp with syntax ${value}`)
+                    value = new RegExp(pattern, flags)
+                }
+            }
+            return (item: any) => (value as RegExp).test(get(item, ref))
+        },
+        $gt(ref: string, value: any) {
+            return (item: any) => get(item, ref, 0) > Number(value)
+        },
+        $gte(ref: string, value: any) {
+            return (item: any) => get(item, ref, 0) >= Number(value)
+        },
+        $in(ref: string, value: any) {
+            return (item: any) => value.includes(get(item, ref))
+        },
+        $includes(ref: string, value: any) {
+            return (item: any) => {
+                const arr = get(item, ref, []);
+                return Array.isArray(arr) && arr.includes(value)
+            }
+        },
+        $lt(ref: string, value: any) {
+            return (item: any) => get(item, ref, 0) < Number(value)
+        },
+        $lte(ref: string, value: any) {
+            return (item: any) => get(item, ref, 0) <= Number(value)
+        },
+        $not(ref: string, value: any) {
+            // value = typeof (value??0)==='object' ? ()=>filter()
+            // value = value instanceof QueryConstructor ? value : (
+            //     typeof (value ?? 0) === 'object' ? new QueryConstructor(value as Query, ref) : value
+            // ) as Inmutables
+            // return (item: any) => !(value instanceof QueryConstructor ? value(item) : get(item, ref) === value)
+        },
+    }
+    return function build(query: any) {
+        const arr = make(query, '', { ...native, ...methods })
+        return function match(item: any) {
+            return arr.every(fn => fn(item))
+        }
     }
 }
 
