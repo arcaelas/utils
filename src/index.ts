@@ -424,7 +424,7 @@ export function query(methods: any) {
             if (key in handlers)
                 arr.push(handlers[key](_ref, value))
             else if (typeof (value ?? false) === 'object')
-                arr = arr.concat(make(value, _ref, handlers)) as any[]
+                arr = arr.concat(make(value, key, handlers)) as any[]
             else
                 arr.push(handlers.$eq(_ref, value))
         }
