@@ -42,15 +42,24 @@ export type Inmutables = Exclude<IObject[string], any[] | undefined | IObject>
 
 /**
  * @description
- * Use this method to check if a value is an Plain Object
+ * This method superficially copies the properties of an object, this method is recommended only for flat objects;
+ * @description
+ * Recursive objects or objects that have dependent properties such as Buffer, ArrayBuffer, Blob, File, etc;
+ * @description
+ * They will be negatively affected.
  * @example
- * isObject({}) // true
- * isObject([]) // false
- * isObject(null) // false
- * isObject(new WebSocket(...)) // false
-*/
-export function isObject(fn: any): fn is IObject {
-    return typeof (fn ?? false) === 'object'
+ * const me = { id: 1, profile: { username:"arcaelas" } }
+ * const tmp = copy(me)
+ * tmp.profile.username = "insiders"
+ * console.log( me.profile.username ) // arcaelas
+ * console.log( tmp.profile.username ) // insiders
+ */
+export function copy<T extends any = any>(original: T): T {
+    if (Array.isArray(original))
+        return original.map(copy) as T
+    else if (typeof (original ?? 0) === 'object')
+        return merge({}, original)
+    return original
 }
 
 /**
