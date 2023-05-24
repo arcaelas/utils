@@ -282,6 +282,17 @@ export function set<T extends IObject = IObject>(target: T, path: string = '', v
     return target;
 }
 
+
+
+export interface SourceOptions {
+    /**
+     * @description
+     * Pattern for match key
+     * @default
+     * /\${([^}]+)}/
+     */
+    pattern?: RegExp
+}
 /**
  * @description
  * Replaces the string properties of a template from an element.
@@ -290,26 +301,35 @@ export function set<T extends IObject = IObject>(target: T, path: string = '', v
  * 
  * console.log( schema({ email:"community@arcaelas.com", username:"arcaelas" }) )
  * // Output: { github:"https://github.com/arcaelas" }
+ * @example
+ * // Custom pattern
+ * const schema = source({
+ *  url:"/api/:version/:name"
+ * }, {
+ *  pattern: /\:(\w+)/
+ * })
+ * const options = schema({ version:"v1.0", name:"cloud-run" })
+ * 
+ * // Output: { url:"/api/v1.0/cloud-run" }
  */
-export function source<T extends IObject = IObject>(schema: T): (item: IObject) => T {
-    function map(object: any, ref: string = "", arr: any[] = []) {
-        for (const key in object) {
-            let _ref = (ref && ref + '.') + key
-            switch (typeof (object[key] ?? 0)) {
-                case 'string':
-                    arr.push(item => [
-                        _ref, String(schema[key]).replaceAll(/\$\{([^}]+)\}/g, (a, b) => get(item, b, ''))
-                    ])
-                    break
-                case 'object':
-                    arr = map(object[key], _ref, arr)
-                    break
-            }
+export function source<T>(schema: T, options: SourceOptions = {}): (item: IObject) => T {
+    options.pattern ??= /\${([^}]+)}/
+    function replace(content: any, resource: any) {
+        if (Array.isArray(content))
+            return content.map(e => replace(e, resource))
+        else if (typeof (content ?? 0) === 'object') {
+            for (const key in content)
+                content[key] = replace(content[key], resource)
+            return content
         }
-        return arr
+        else if (typeof content === 'string') {
+            const slugs = content.matchAll(new RegExp(options.pattern as RegExp, 'g'))
+            for (const [regexp, index] of slugs)
+                content = content.replaceAll(regexp, get(resource, index, ''))
+        }
+        return content
     }
-    const setters = map(schema)
-    return item => setters.reduce((o, fn) => (set as Noop)(o, ...fn(item)), copy(schema))
+    return item => replace(schema, item)
 }
 
 export interface QueryTypes {
