@@ -432,34 +432,8 @@ export function query<T>(methods?: T):
     (query: Query<T>) =>
         <I extends IObject>(item: I) => boolean;
 export function query(methods: any) {
-    function make(query: Query, ref: string, handlers: any) {
-        let arr: any[] = []
-        for (const key in query) {
-            let _ref = (ref && ref + '.') + key, value = query[key] as any
-            if (value instanceof RegExp) {
-                const [, pattern, flags = ''] = String(value).match(/^(.*)?\/([a-z]+)?$/) || []
-                if (!pattern) throw new ReferenceError(`RegExp with syntax: ${value}`)
-                value = { $exp: { pattern, flags } }
-            }
-            if (key in handlers) {
-                arr.push(handlers[key](ref, value))
-                break
-            }
-            else if (typeof (value ?? false) === 'object')
-                arr = arr.concat(make(value, _ref, handlers)) as any[]
-            else
-                arr.push(handlers.$eq(_ref, value))
-        }
-        return arr
-    }
-    function build(query: any) {
-        const arr = make(query, '', { ...native, ...methods })
-        return function match(item: any) {
-            return arr.every(fn => fn(item))
-        }
-    }
 
-    const native = {
+    const validators = Object.assign({}, {
         $eq(ref: string, value: any) {
             return (item: any) => get(item, ref) === value
         },
@@ -467,15 +441,9 @@ export function query(methods: any) {
             return (item: any) => has(item, ref) === value
         },
         $exp(ref: string, value: any) {
-            if (!(value instanceof RegExp)) {
-                if (value.pattern) value = new RegExp(value.pattern, value.flags ?? '')
-                else {
-                    const [, pattern, flags = ''] = String(value).match(/^(.*)?\/([a-z]+)?$/) || []
-                    if (!pattern) throw new ReferenceError(`ErrorType: RegExp with syntax ${value}`)
-                    value = new RegExp(pattern, flags)
-                }
-            }
-            return (item: any) => (value as RegExp).test(get(item, ref))
+            if (!value.pattern) throw new ReferenceError(`ErrorType: RegExp with syntax ${value}`)
+            value = new RegExp(value.pattern, value.flags ?? '')
+            return (item: any) => value.test(get(item, ref, null))
         },
         $gt(ref: string, value: any) {
             return (item: any) => get(item, ref, 0) > Number(value)
@@ -504,6 +472,33 @@ export function query(methods: any) {
             )
             return (item: any) => !value(item)
         },
+    }, methods)
+
+    function make(query: Query, ref?: string, handlers?: any) {
+        let arr: any[] = []
+        for (const key in query) {
+            let _ref = (ref && ref + '.') + key, value = query[key] as any
+            if (value instanceof RegExp) {
+                const [, pattern, flags] = String(value).match(/^\/(.*)?\/([a-z]+)?/) ?? []
+                if (!pattern) throw new ReferenceError(`RegExp with syntax: ${value}`)
+                value = { $exp: { pattern, flags: flags ?? '' } }
+            }
+            if (key in handlers) {
+                arr.push(handlers[key](ref, value))
+                break
+            }
+            else if (typeof (value ?? false) === 'object')
+                arr = arr.concat(make(value, _ref, handlers)) as any[]
+            else
+                arr.push(handlers.$eq(_ref, value))
+        }
+        return arr
+    }
+    function build(query: any) {
+        const arr = make(query, '', validators)
+        return function match(item: any) {
+            return arr.every(fn => fn(item))
+        }
     }
     return build
 }
