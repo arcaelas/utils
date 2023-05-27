@@ -28,7 +28,7 @@ export type Inmutables = Exclude<IObject[string], any[] | undefined | IObject>
  * @description
  * Type for Object
  */
-export interface IObject<T = undefined> {
+export interface IObject<T = unknown> {
     [K: string | number | symbol]:
     | string | number | boolean | bigint | T | IObject<T>
     | Array<string | number | boolean | bigint | T | IObject<T>>
