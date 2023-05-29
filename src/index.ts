@@ -432,7 +432,6 @@ export function query<T>(methods?: T):
     (query: Query<T>) =>
         <I extends IObject>(item: I) => boolean;
 export function query(methods: any) {
-
     const validators = Object.assign({}, {
         $eq(ref: string, value: any) {
             return (item: any) => get(item, ref) === value
@@ -473,7 +472,6 @@ export function query(methods: any) {
             return (item: any) => !value(item)
         },
     }, methods)
-
     function make(query: Query, ref?: string, handlers?: any) {
         let arr: any[] = []
         for (const key in query) {
