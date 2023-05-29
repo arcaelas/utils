@@ -288,8 +288,10 @@ export interface SourceOptions {
     /**
      * @description
      * Pattern for match key
+     * @example
+     * /\${([^\$\{\}]+)}/g match with ${key} ${other_key}
      * @default
-     * /\${([^}]+)}/
+     * /\${([^\$\{\}]+)}/g
      */
     pattern?: RegExp
 }
@@ -313,7 +315,11 @@ export interface SourceOptions {
  * // Output: { url:"/api/v1.0/cloud-run" }
  */
 export function source<T>(schema: T, options: SourceOptions = {}): (item: IObject) => T {
-    options.pattern ??= /\${([^}]+)}/
+    options = {
+        pattern: /\${([^${}]+)}/g,
+        ...options
+    }
+
     function replace(content: any, resource: any) {
         if (Array.isArray(content))
             return content.map(e => replace(e, resource))
@@ -323,9 +329,9 @@ export function source<T>(schema: T, options: SourceOptions = {}): (item: IObjec
             return content
         }
         else if (typeof content === 'string') {
-            const slugs = content.matchAll(new RegExp(options.pattern as RegExp, 'g'))
-            for (const [regexp, index] of slugs)
-                content = content.replaceAll(regexp, get(resource, index, ''))
+            return content.replace(options.pattern as RegExp, (_a: string, k: string) =>
+                get(resource, k, '')
+            )
         }
         return content
     }
