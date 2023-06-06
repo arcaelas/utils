@@ -160,14 +160,14 @@ export function has(object: IObject, path: string): boolean {
  * @returns {string[]}
 */
 export function keys<T extends IObject = IObject>(object: T): Array<keyof T | string> {
-    function dd(o: any, p: string = '', a: string[] = []) {
-        for (const key in o) {
-            let path = (p && p + '.') + key
-            if (typeof (o[key] ?? 0) === 'object')
-                a.push(...dd(o[key], path, a))
-            else a.push(path)
+    function dd(item: any, arr: string[] = [], ref: string = '') {
+        for (const key in item) {
+            const value = item[key]
+            const _ref = (ref && ref + '.') + key
+            if (typeof (value ?? 0) === 'object') dd(value, arr, _ref)
+            else arr.push(_ref)
         }
-        return a
+        return arr
     }
     return dd(object)
 }
