@@ -76,7 +76,7 @@ export type Inmutables = boolean | string | number | bigint;
  */
 export type JsonObject =
   | {
-      [K: string | number]: boolean | string | number | bigint | JsonObject;
+      [K: string | number | symbol]: Inmutables | null | undefined | JsonObject;
     }
   | JsonObject[];
 
