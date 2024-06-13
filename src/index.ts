@@ -13,9 +13,8 @@
  *     post = { user:"", email: "" } // Success
  */
 export type AlmostOne<T> = {
-  [K in keyof T]: Record<K, T[K]>;
+    [K in keyof T]: Record<K, T[K]>;
 }[keyof T];
-
 /**
  * @description
  * The object must have only one of these props, but not at time.
@@ -32,10 +31,8 @@ export type AlmostOne<T> = {
  *     post = { uuid: "" } // Success
  */
 export type OnlyOne<T> = {
-  [K in keyof T]-?: Partial<Record<Exclude<keyof T, K>, never>> &
-    Record<K, T[K]>;
+    [K in keyof T]-?: Partial<Record<Exclude<keyof T, K>, never>> & Record<K, T[K]>;
 }[keyof T];
-
 /**
  * @deprecated
  * Utilizar {@link OnlyOne} en lugar de {@link OneOf}
@@ -43,10 +40,8 @@ export type OnlyOne<T> = {
  * Create a type where only one prop is available
  */
 export type OneOf<T> = {
-  [K in keyof T]-?: Partial<Record<Exclude<keyof T, K>, never>> &
-    Record<K, T[K]>;
+    [K in keyof T]-?: Partial<Record<Exclude<keyof T, K>, never>> & Record<K, T[K]>;
 }[keyof T];
-
 /**
  * @description
  * Set self object for function
@@ -59,26 +54,20 @@ export type OneOf<T> = {
  *  this.console.log( message )
  * }
  */
-export type Bind<T extends any, H extends Noop> = (
-  this: T,
-  ...args: Parameters<H>
-) => ReturnType<H>;
-
+export type Bind<T extends any, H extends Noop> = (this: T, ...args: Parameters<H>) => ReturnType<H>;
 /**
  * @description
  * Allow only values at number, string, bigint and booleans.
  */
 export type Inmutables = boolean | string | number | bigint;
-
 /**
  * @description
  * Create a static Object with dynamic properties.
  */
-export type JsonObject =
-  | {
-      [K: string | number | symbol]: Inmutables | null | undefined | JsonObject;
-    }
-  | JsonObject[];
+export type JsonObject = {
+    [K: string | number | symbol]: string | number | boolean | null | undefined | JsonObject | JsonObject[string] | JsonObject[string][]
+} | JsonObject[];
+
 
 /**
  * @deprecated
@@ -87,129 +76,115 @@ export type JsonObject =
  * An object with static props and values.
  */
 export interface IObject<T = unknown> {
-  [K: string | number | symbol]:
-    | string
-    | number
-    | boolean
-    | bigint
-    | IObject<T>
-    | Array<string | number | boolean | bigint | T | IObject<T>>;
+    [K: string | number | symbol]: string | number | boolean | bigint | IObject<T> | Array<string | number | boolean | bigint | T | IObject<T>>;
 }
-
 /**
  * @description
  * Create Sync and Async Function as FunctionType
  */
-export type Noop<A = any, R = any> = (
-  ...args: A extends any[] ? A : A[]
-) => R | Promise<R>;
-
+export type Noop<A = any, R = any> = (...args: A extends any[] ? A : A[]) => R | Promise<R>;
 /**
  * @description
  * Create Sync Function as FunctionType
  */
-export type NoopSync<A = any, R = any> = (
-  ...args: A extends any[] ? A : A[]
-) => R;
-
-export interface Promify<S extends any = any, E extends any = any>
-  extends Promise<S> {
-  status: "pending" | "filled" | "failed";
-  /**
-   * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-   * resolved value cannot be modified from the callback.
-   * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-   * @returns A Promise for the completion of the callback.
-   */
-  finally(onfinally?: (() => void) | undefined | null): Promise<S>;
-  reject<O = E>(filled?: O): Promise<O>;
-  resolve<O = S>(filled?: O): Promise<O>;
+export type NoopSync<A = any, R = any> = (...args: A extends any[] ? A : A[]) => R;
+export interface Promify<S extends any = any, E extends any = any> extends Promise<S> {
+    status: "pending" | "filled" | "failed";
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<S>;
+    reject<O = E>(filled?: O): Promise<O>;
+    resolve<O = S>(filled?: O): Promise<O>;
 }
-
 export interface SourceOptions {
-  /**
-   * @description
-   * Pattern for match key
-   * @example
-   * /\${([^\$\{\}]+)}/g match with ${key} ${other_key}
-   * @default
-   * /\${([^\$\{\}]+)}/g
-   */
-  pattern?: RegExp;
+    /**
+     * @description
+     * Pattern for match key
+     * @example
+     * /\${([^\$\{\}]+)}/g match with ${key} ${other_key}
+     * @default
+     * /\${([^\$\{\}]+)}/g
+     */
+    pattern?: RegExp;
 }
-
 export interface QueryTypes {
-  /**
-   * @description
-   * The $eq operator matches documents where the value of a field equals the specified value.
-   * @example
-   * {
-   *  age: 18
-   * }
-   * @example
-   * {
-   *  age: {
-   *      $eq: 18
-   *  }
-   * }
-   */
-  $eq: Inmutables;
-  /**
-   * @description
-   * Check if document have a field specified.
-   */
-  $exists: boolean;
-  /**
-   * @description
-   * Matches documents where field value is matched with RegExp or RegExp ON (RegExp Object Notation)
-   */
-  $exp: RegExp | { pattern: string; flags?: string };
-  /**
-   * @description
-   * Verify if field value is greater than (i.e. >) the specified value.
-   */
-  $gt: number;
-  /**
-   * @description
-   * Verify if field value is greater than or equal (i.e. >=) the specified value.
-   */
-  $gte: number;
-  /**
-   * @description
-   * Use $in operator to validate if field value exist in a specific array element
-   */
-  $in: Inmutables[];
-  /**
-   * @description
-   * Check if field value contain a value specified
-   */
-  $includes: Inmutables;
-  /**
-   * @description
-   * Verify if field value is less than (i.e. <) the specified value.
-   */
-  $lt: number;
-  /**
-   * @description
-   * Verify if field value is less than or equal (i.e. <=) the specified value.
-   */
-  $lte: number;
-  /**
-   * @description
-   * The $not operator matches documents where the value of a field not equals the specified value.
-   * @example
-   * { $not: { age: 18 } }
-   * { age: { $not: 18 } }
-   * { age: { $not: { $eq: 18 } } }
-   */
-  $not: Inmutables | RegExp | OneOf<Omit<QueryTypes, "$not">>;
+    /**
+     * @description
+     * The $eq operator matches documents where the value of a field equals the specified value.
+     * @example
+     * {
+     *  age: 18
+     * }
+     * @example
+     * {
+     *  age: {
+     *      $eq: 18
+     *  }
+     * }
+     */
+    $eq: Inmutables;
+    /**
+     * @description
+     * Check if document have a field specified.
+     */
+    $exists: boolean;
+    /**
+     * @description
+     * Matches documents where field value is matched with RegExp or RegExp ON (RegExp Object Notation)
+     */
+    $exp: RegExp | {
+        pattern: string;
+        flags?: string;
+    };
+    /**
+     * @description
+     * Verify if field value is greater than (i.e. >) the specified value.
+     */
+    $gt: number;
+    /**
+     * @description
+     * Verify if field value is greater than or equal (i.e. >=) the specified value.
+     */
+    $gte: number;
+    /**
+     * @description
+     * Use $in operator to validate if field value exist in a specific array element
+     */
+    $in: Inmutables[];
+    /**
+     * @description
+     * Check if field value contain a value specified
+     */
+    $includes: Inmutables;
+    /**
+     * @description
+     * Verify if field value is less than (i.e. <) the specified value.
+     */
+    $lt: number;
+    /**
+     * @description
+     * Verify if field value is less than or equal (i.e. <=) the specified value.
+     */
+    $lte: number;
+    /**
+     * @description
+     * The $not operator matches documents where the value of a field not equals the specified value.
+     * @example
+     * { $not: { age: 18 } }
+     * { age: { $not: 18 } }
+     * { age: { $not: { $eq: 18 } } }
+     */
+    $not: Inmutables | RegExp | OneOf<Omit<QueryTypes, "$not">>;
 }
 export type Query<I = QueryTypes, T = NonNullable<I> & QueryTypes> = {
-  [K in keyof T]?: never;
+    [K in keyof T]?: never;
 } & {
-  [K in string]-?: Inmutables | RegExp | Query<T> | OneOf<T>;
+    [K in string]-?: Inmutables | RegExp | Query<T> | OneOf<T>;
 };
-
 /**
  * @description "Blank" is a method to check if a value is never or is empty value.
  * @example
@@ -220,17 +195,7 @@ export type Query<I = QueryTypes, T = NonNullable<I> & QueryTypes> = {
  * blank('   ') // true
  * blank(undefined) // true
  */
-export function blank(arr: any): boolean {
-  return (
-    null ||
-    arr === null ||
-    arr === undefined ||
-    (Array.isArray(arr) && !arr.length) ||
-    (typeof arr === "string" && arr.trim().length == 0) ||
-    (arr && typeof arr === "object" && !Object.keys(arr).length)
-  );
-}
-
+export declare function blank(arr: any): boolean;
 /**
  * @description
  * This method superficially copies the properties of an object, this method is recommended only for flat objects;
@@ -245,12 +210,7 @@ export function blank(arr: any): boolean {
  * console.log( me.profile.username ) // arcaelas
  * console.log( tmp.profile.username ) // insiders
  */
-export function copy<T extends any = any>(original: T): T {
-  if (Array.isArray(original)) return original.map(copy) as T;
-  else if (typeof (original ?? 0) === "object") return merge({}, original);
-  return original;
-}
-
+export declare function copy<T extends any = any>(original: T): T;
 /**
  * @description Return true if value is not empty.
  * @example
@@ -264,15 +224,7 @@ export function copy<T extends any = any>(original: T): T {
  * empty([ false ]) // false
  * empty([ undefined ]) // false
  */
-export function empty<T extends any = any>(value: T): boolean {
-  return (
-    [undefined, null, false, 0].includes(value as any) ||
-    (["object", "string"].includes(typeof value) &&
-      !Object.keys(value as any).length) ||
-    (Array.isArray(value) && !value.length)
-  );
-}
-
+export declare function empty<T extends any = any>(value: T): boolean;
 /**
  * @description
  * Get any property from an object, using path-key as key.
@@ -281,20 +233,7 @@ export function empty<T extends any = any>(value: T): boolean {
  * get(props, 'a') // 1
  * get(props, 'c.d') // 3
  */
-export function get<T = any, D = any>(
-  object: object,
-  path = "",
-  defaultValue?: D
-): T | D {
-  try {
-    return path
-      .split(".")
-      .reduce((obj: any, key: string) => obj[key], object) as any;
-  } catch (err) {
-    return defaultValue as D;
-  }
-}
-
+export declare function get<T = any, D = any>(object: object, path?: string, defaultValue?: D): T | D;
 /**
  * @description
  * Check if a property is in object, using path-key as key.
@@ -303,15 +242,7 @@ export function get<T = any, D = any>(
  * has(props, 'a') // true
  * has(props, 'e') // false
  */
-export function has(object: JsonObject, path: string): boolean {
-  try {
-    path.split(".").reduce((o, k) => (k in o ? o[k] : null), object as any);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-
+export declare function has(object: JsonObject, path: string): boolean;
 /**
  * @description
  * Get properties of object as path-key format
@@ -321,96 +252,26 @@ export function has(object: JsonObject, path: string): boolean {
  * @param {{}} object
  * @returns {string[]}
  */
-export function keys(object: JsonObject): string[] {
-  function dd(item: any, arr: string[] = [], ref: string = "") {
-    for (const key in item) {
-      const value = item[key];
-      const _ref = (ref && ref + ".") + key;
-      if (typeof (value ?? 0) === "object") dd(value, arr, _ref);
-      else arr.push(_ref);
-    }
-    return arr;
-  }
-  return dd(object);
-}
-
+export declare function keys(object: JsonObject): string[];
 /**
  * @description
  * Mixes properties to a target object, mutating its initial structure.
  * @description
  * Use only with flat objects.
  */
-export function merge(target: any, ...items: any[]): any {
-  target = typeof (target ?? 0) === "object" ? target : {};
-  for (const item of items) {
-    if (typeof (item ?? 0) !== "object") continue;
-    for (const key in item) {
-      const value = item[key];
-      if (
-        typeof (target[key] ?? 0) === "object" &&
-        typeof (value ?? 0) === "object"
-      )
-        target[key] = merge(target[key], value);
-      else target[key] = value;
-    }
-  }
-  return target;
-}
-
+export declare function merge(target: any, ...items: any[]): any;
 /**
  * @deprecated
  * @description
  * Merges only the properties that are different from the initial object.
  */
-export function mergeDiff(base: JsonObject, ...items: JsonObject[]) {
-  base = typeof (base ?? 0) === "object" ? base : {};
-  while (items.length) {
-    const item = items.shift();
-    if (typeof (item ?? 0) !== "object") continue;
-    for (const key in item) {
-      const value = item[key];
-      if (
-        key in base &&
-        typeof (value ?? 0) === "object" &&
-        typeof (base[key] ?? 0) === "object"
-      ) {
-        base[key] = mergeDiff(base[key] as JsonObject, value as JsonObject);
-      } else base[key] = value;
-    }
-  }
-  return base;
-}
-
-export function promify<S extends any = any, E extends any = any>(): Promify<
-  S,
-  E
-> {
-  const status: any = { reject: Date.now, resolve: Date.now };
-  const promise: any = new Promise((resolve, reject) =>
-    Object.assign(status, { resolve, reject })
-  );
-  promise.status = "pending";
-  promise.reject = (o: any) => {
-    status.reject(o as any);
-    promise.status = "failed";
-    return promise;
-  };
-  promise.resolve = (o: any) => {
-    status.resolve(o as any);
-    promise.status = "filled";
-    return promise;
-  };
-  return promise as any;
-}
-
+export declare function mergeDiff(base: JsonObject, ...items: JsonObject[]): JsonObject;
+export declare function promify<S extends any = any, E extends any = any>(): Promify<S, E>;
 /**
  * @description
  * Get random number.
  */
-export function rand(min: number = -Infinity, max: number = Infinity): number {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
+export declare function rand(min?: number, max?: number): number;
 /**
  * @description
  * Use this method to supress process by a few time
@@ -420,10 +281,7 @@ export function rand(min: number = -Infinity, max: number = Infinity): number {
  *  return form.submit()
  * }
  */
-export async function sleep(timeout = Infinity) {
-  await new Promise((r) => setTimeout(r, timeout));
-}
-
+export declare function sleep(timeout?: number): Promise<void>;
 /**
  * @description
  * Define any property in object, using path-key as key.
@@ -437,29 +295,7 @@ export async function sleep(timeout = Infinity) {
  * set(props, 'c.d', 50)
  * props.c.d // 50
  */
-export function set<T extends JsonObject = JsonObject>(
-  target: T,
-  path: string = "",
-  value: any
-): T {
-  let keys = path.split(".");
-  while (keys.length) {
-    let key = keys.shift() as string;
-    Object.assign(target, {
-      [key]: !keys.length
-        ? value
-        : key in target
-        ? target[key] && typeof target[key] === "object"
-          ? target[key]
-          : keys.length
-          ? {}
-          : value
-        : {},
-    });
-  }
-  return target;
-}
-
+export declare function set<T extends JsonObject = JsonObject>(target: T, path: string | undefined, value: any): T;
 /**
  * @description
  * Replaces the string properties of a template from an element.
@@ -479,31 +315,7 @@ export function set<T extends JsonObject = JsonObject>(
  *
  * // Output: { url:"/api/v1.0/cloud-run" }
  */
-export function source<T>(
-  schema: T,
-  options: SourceOptions = {}
-): (item: JsonObject) => T {
-  options = {
-    pattern: /\${([^${}]+)}/g,
-    ...options,
-  };
-
-  function replace(content: any, resource: any) {
-    if (Array.isArray(content)) return content.map((e) => replace(e, resource));
-    else if (typeof (content ?? 0) === "object") {
-      for (const key in content) content[key] = replace(content[key], resource);
-      return content;
-    } else if (typeof content === "string") {
-      return content.replace(
-        options.pattern as RegExp,
-        (_a: string, k: string) => get(resource, k, "")
-      );
-    }
-    return content;
-  }
-  return (item) => replace(schema, item);
-}
-
+export declare function source<T>(schema: T, options?: SourceOptions): (item: JsonObject) => T;
 /**
  * @description
  * Create query handlers that allow you to compare objects
@@ -530,87 +342,7 @@ export function source<T>(
  * const offline = items.filter(item=> match( item ))
  *
  */
-export function query<T>(
-  methods?: T
-): (query: Query<T>) => <I extends JsonObject>(item: I) => boolean;
-export function query(methods: any) {
-  const validators = Object.assign(
-    {},
-    {
-      $eq(ref: string, value: any) {
-        return (item: any) => get(item, ref) === value;
-      },
-      $exists(ref: string, value: any) {
-        return (item: any) => has(item, ref) === value;
-      },
-      $exp(ref: string, value: any) {
-        if (!value.pattern)
-          throw new ReferenceError(`ErrorType: RegExp with syntax ${value}`);
-        value = new RegExp(value.pattern, value.flags ?? "");
-        return (item: any) => value.test(get(item, ref, null));
-      },
-      $gt(ref: string, value: any) {
-        return (item: any) => get(item, ref, 0) > Number(value);
-      },
-      $gte(ref: string, value: any) {
-        return (item: any) => get(item, ref, 0) >= Number(value);
-      },
-      $in(ref: string, value: any) {
-        return (item: any) => value.includes(get(item, ref));
-      },
-      $includes(ref: string, value: any) {
-        return (item: any) => {
-          const arr = get(item, ref, []);
-          return Array.isArray(arr) && arr.includes(value);
-        };
-      },
-      $lt(ref: string, value: any) {
-        return (item: any) => get(item, ref, 0) < Number(value);
-      },
-      $lte(ref: string, value: any) {
-        return (item: any) => get(item, ref, 0) <= Number(value);
-      },
-      $not(ref: string, value: any) {
-        value =
-          typeof (value ?? 0) === "object"
-            ? build(value)
-            : typeof value === "function"
-            ? value
-            : (i) => get(i, ref, null) === value;
-        return (item: any) => !value(item);
-      },
-    },
-    methods
-  );
-  function make(query: Query, ref?: string, handlers?: any) {
-    let arr: any[] = [];
-    for (const key in query) {
-      let _ref = (ref && ref + ".") + key,
-        value = query[key] as any;
-      if (value instanceof RegExp) {
-        const [, pattern, flags] =
-          String(value).match(/^\/(.*)?\/([a-z]+)?/) ?? [];
-        if (!pattern) throw new ReferenceError(`RegExp with syntax: ${value}`);
-        value = { $exp: { pattern, flags: flags ?? "" } };
-      }
-      if (key in handlers) {
-        arr.push(handlers[key](ref, value));
-        break;
-      } else if (typeof (value ?? false) === "object")
-        arr = arr.concat(make(value, _ref, handlers)) as any[];
-      else arr.push(handlers.$eq(_ref, value));
-    }
-    return arr;
-  }
-  function build(query: any) {
-    const arr = make(query, "", validators);
-    return function match(item: any) {
-      return arr.every((fn) => fn(item));
-    };
-  }
-  return build;
-}
-
+export declare function query<T>(methods?: T): (query: Query<T>) => <I extends JsonObject>(item: I) => boolean;
 /**
  * @description
  * Remove any property from an object, using path-key as key.
@@ -624,83 +356,15 @@ export function query(methods: any) {
  * unset(props, 'c.d')
  * props.c // undefined
  */
-export function unset(target: JsonObject, path: string = ""): JsonObject {
-  let object = target,
-    keys = path.split(".");
-  while (keys.length) {
-    const key = keys.shift() as string;
-    if (!keys.length) delete object[key];
-    else if (typeof (object[key] ?? false) === "object")
-      object = object[key] as JsonObject;
-    else break;
-  }
-  return target;
-}
-
-export function setcookie(
-  name: string,
-  ...props: [string, number, ...any]
-): string {
-  return props.length ? cookie.set(name, ...props) : (cookie.get(name) as any);
-}
-export function unsetcookie(name: string): boolean {
-  return cookie.remove(name);
-}
-
-export const cookie = {
-  toSeconds: function (time = 3, e = 0) {
-    time = empty(time) ? 0 : time;
-    let now = new Date().getTime();
-    time = !isNaN(Number(time))
-      ? new Date().getTime() + time
-      : typeof time === "string"
-      ? new Date(time).getTime()
-      : new Date("2035").getTime();
-    return (e = time - now), e > 0 ? e : 0;
-  },
-  set: function (
-    name: string,
-    value: string,
-    time: number | string = Infinity,
-    path?: string,
-    domain?: string,
-    https: boolean = false
-  ): void | string {
-    return (
-      (document.cookie =
-        encodeURIComponent(name) +
-        "=" +
-        encodeURIComponent(value) +
-        ("; max-age=" + this.toSeconds(time as number)) +
-        (path ? "; path=" + path : "") +
-        (domain ? "; domain=" + domain : "") +
-        (https ? "; secure" : "")),
-      value
-    );
-  },
-  get: function (name: string): string {
-    return this.all[name as any] || undefined;
-  },
-  remove: function (name: string, ...server: any[]): boolean {
-    return (
-      this.set(name, undefined as any, undefined, ...server),
-      !this.all[name as any]
-    );
-  },
-  has: function (key: string): boolean {
-    return Object.keys(this.all).some((e) => e === key);
-  },
-  get all() {
-    var cookies: any[] = [];
-    return (
-      document.cookie.split(";").forEach((cookie) => {
-        cookies[
-          decodeURIComponent(
-            cookie.substr(0, cookie.indexOf("="))
-          ).trim() as any
-        ] = decodeURIComponent(cookie.substr(cookie.indexOf("=") + 1));
-      }),
-      cookies
-    );
-  },
+export declare function unset(target: JsonObject, path?: string): JsonObject;
+export declare function setcookie(name: string, ...props: [string, number, ...any]): string;
+export declare function unsetcookie(name: string): boolean;
+export declare const cookie: {
+    toSeconds: (time?: number, e?: number) => number;
+    set: (name: string, value: string, time?: number | string, path?: string, domain?: string, https?: boolean) => void | string;
+    get: (name: string) => string;
+    remove: (name: string, ...server: any[]) => boolean;
+    has: (key: string) => boolean;
+    readonly all: any[];
 };
+//# sourceMappingURL=index.d.ts.map
