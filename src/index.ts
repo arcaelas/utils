@@ -71,38 +71,34 @@ export type Inmutables = boolean | string | number | bigint;
  * @description
  * Create a plain object as JSON
  */
-export type JsonObject =
-  | {
-      [K: string | number | symbol]:
-        | null
-        | null[]
-        | undefined
-        | undefined[]
-        | Inmutables
-        | Inmutables[]
-        | JsonObject
-        | JsonObject[];
-    }
-  | JsonObject[];
+export type JsonObject = {
+  [K: string | number | symbol]:
+    | null
+    | null[]
+    | undefined
+    | undefined[]
+    | Inmutables
+    | Inmutables[]
+    | JsonObject
+    | JsonObject[];
+};
 
 /**
  * @description
  * Create a JSON with Function props valid.
  */
-export type JavaScriptObject =
-  | {
-      [K: string | number | symbol]:
-        | null
-        | null[]
-        | undefined
-        | undefined[]
-        | Inmutables
-        | Inmutables[]
-        | JsonObject
-        | JsonObject[]
-        | Noop;
-    }
-  | JsonObject[];
+export type JavaScriptObject = {
+  [K: string | number | symbol]:
+    | null
+    | null[]
+    | undefined
+    | undefined[]
+    | Inmutables
+    | Inmutables[]
+    | JsonObject
+    | JsonObject[]
+    | Noop;
+};
 
 /**
  * @deprecated
