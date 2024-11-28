@@ -242,7 +242,7 @@ export type Query<I = QueryTypes, T = NonNullable<I> & QueryTypes> = {
  */
 export function blank(arr: any): boolean {
   return (
-    null ||
+    false ||
     arr === null ||
     arr === undefined ||
     (Array.isArray(arr) && !arr.length) ||
@@ -325,7 +325,12 @@ export function get<T = any, D = any>(
  */
 export function has(object: JsonObject, path: string): boolean {
   try {
-    path.split(".").reduce((o, k) => (k in o ? o[k] : null), object as any);
+    path.split(".").reduce((o, k) => {
+      if (typeof (o ?? 0) === "object") {
+        if (k in o) return o[k];
+        else throw new Error(`Object has no property ${k}`);
+      } else throw new Error(`Object is not an object`);
+    }, object as any);
     return true;
   } catch (err) {
     return false;
