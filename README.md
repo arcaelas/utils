@@ -11,7 +11,25 @@ Let's start with the basic implementation steps.
 `npm i --save @arcaelas/utils`
 `yarn add --save @arcaelas/utils`
 
-## Implementatión
+## Table of Contents
+- [Installation](#installation)
+- [blank](#blank-value-any-boolean)
+- [copy](#copyobject-any-object)
+- [empty](#empty-value-any-boolean)
+- [promify](#promify)
+- [rand](#rand-min-number-max-number-number)
+- [sleep](#sleep-ms-number-never)
+- [source](#sourceschema-objectfn)
+- [query](#query)
+- [Working with Objects](#working-with-objects)
+  - [get](#geto-object-path-string-default-any-any)
+  - [has](#has-o-object-path-string-boolean)
+  - [keys](#keyso-object-string)
+  - [merge](#mergetarget-object-objects-objecttarget)
+  - [set](#seto-object-path-string-value-any-any)
+  - [unset](#unset-o-object-path-string-boolean)
+
+## Installation
 ```ts
 // Import Statement
 import utils from '@arcaelas/utils'
@@ -20,7 +38,7 @@ import * as utils from '@arcaelas/utils'
 // or
 import { someMethodName } from '@arcaelas/utils'
 
-// EsModule
+// ES Module
 const utils = require('@arcaelas/utils')
 ```
 
@@ -100,7 +118,7 @@ const randFruit = fruits[ rand(0, fruits.length - 1) ]
 ```
 
 ### sleep( ms: *number* ): *never*
-Use this method to **supress** process by a few time
+Use this method to **suppress** the process for a short time
 ```ts
 import { sleep } from '@arcaelas/utils'
 
@@ -301,8 +319,9 @@ get(profile, "skills.frontEnd") // undefined
 <hr/>
 <div  style="text-align:center;margin-top:50px;">
 	<p  align="center">
-		<img  src="https://raw.githubusercontent.com/arcaelas/dist/main/logo/svg/64.svg"  height="32px">
-	<p>
+		<img src="https://raw.githubusercontent.com/arcaelas/dist/main/logo/svg/64.svg" height="32px" alt="Arcaelas logo">
+	</p>
 
-¿Want to discuss any of my open source projects, or something else?Send me a direct message on [Twitter](https://twitter.com/arcaelas).</br> If you already use these libraries and want to support us to continue development, you can sponsor us at [Github Sponsors](https://github.com/sponsors/arcaelas).
+Want to discuss any of my open-source projects or something else? Send me a direct message on [Twitter](https://twitter.com/arcaelas).  
+If you already use these libraries and would like to support continued development, you can sponsor us on [GitHub Sponsors](https://github.com/sponsors/arcaelas).
 </div>
