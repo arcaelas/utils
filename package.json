@@ -42,6 +42,7 @@
     "postpublish": "find src -type f \\( -name '*.js' -o -name '*.d.ts' -o -name '*.map' \\) -delete"
   },
   "devDependencies": {
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.0.4"
   }
 }
