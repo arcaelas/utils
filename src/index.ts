@@ -690,7 +690,7 @@ export const cookie = {
     path?: string,
     domain?: string,
     https: boolean = false
-  ): void | string {
+  ): string {
     return (
       (document.cookie =
         encodeURIComponent(name) +
