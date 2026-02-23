@@ -56,7 +56,7 @@ export type OneOf<T> = {
  *  this.console.log( message )
  * }
  */
-export type Bind<T extends any, H extends Noop> = (
+export type Bind<T, H extends Noop> = (
   this: T,
   ...args: Parameters<H>
 ) => ReturnType<H>;
@@ -129,7 +129,7 @@ export type Noop<A = any, R = any> = (
 export type NoopSync<A = any, R = any> = (
   ...args: A extends any[] ? A : A[]
 ) => R;
-export interface Promify<S extends any = any, E extends any = any>
+export interface Promify<S = any, E = any>
   extends Promise<S> {
   status: "pending" | "filled" | "failed";
   /**
@@ -242,7 +242,6 @@ export type Query<I = QueryTypes, T = NonNullable<I> & QueryTypes> = {
  */
 export function blank(arr: any): boolean {
   return (
-    false ||
     arr === null ||
     arr === undefined ||
     (Array.isArray(arr) && !arr.length) ||
@@ -265,7 +264,7 @@ export function blank(arr: any): boolean {
  * console.log( me.profile.username ) // arcaelas
  * console.log( tmp.profile.username ) // insiders
  */
-export function copy<T extends any = any>(original: T): T {
+export function copy<T = any>(original: T): T {
   if (Array.isArray(original)) return original.map(copy) as T;
   else if (typeof (original ?? 0) === "object") return merge({}, original);
   return original;
@@ -284,7 +283,7 @@ export function copy<T extends any = any>(original: T): T {
  * empty([ false ]) // false
  * empty([ undefined ]) // false
  */
-export function empty<T extends any = any>(value: T): boolean {
+export function empty<T = any>(value: T): boolean {
   return (
     [undefined, null, false, 0].includes(value as any) ||
     (["object", "string"].includes(typeof value) &&
@@ -310,7 +309,7 @@ export function get<T = any, D = any>(
     return path
       .split(".")
       .reduce((obj: any, key: string) => obj[key], object) as any;
-  } catch (err) {
+  } catch (_err) {
     return defaultValue as D;
   }
 }
@@ -332,7 +331,7 @@ export function has(object: JsonObject, path: string): boolean {
       } else throw new Error(`Object is not an object`);
     }, object as any);
     return true;
-  } catch (err) {
+  } catch (_err) {
     return false;
   }
 }
@@ -406,7 +405,7 @@ export function mergeDiff(base: JsonObject, ...items: JsonObject[]) {
   return base;
 }
 
-export function promify<S extends any = any, E extends any = any>(): Promify<
+export function promify<S = any, E = any>(): Promify<
   S,
   E
 > {
@@ -467,9 +466,9 @@ export function set<T extends JsonObject = JsonObject>(
   path: string = "",
   value: any
 ): T {
-  let keys = path.split(".");
+  const keys = path.split(".");
   while (keys.length) {
-    let key = keys.shift() as string;
+    const key = keys.shift() as string;
     Object.assign(target, {
       [key]: !keys.length
         ? value
@@ -610,8 +609,8 @@ export function query(methods: any) {
   function make(query: Query, ref?: string, handlers?: any) {
     let arr: any[] = [];
     for (const key in query) {
-      let _ref = (ref && ref + ".") + key,
-        value = query[key] as any;
+      const _ref = (ref && ref + ".") + key;
+      let value = query[key] as any;
       if (value instanceof RegExp) {
         const [, pattern, flags] =
           String(value).match(/^\/(.*)?\/([a-z]+)?/) ?? [];
@@ -650,8 +649,8 @@ export function query(methods: any) {
  * props.c // undefined
  */
 export function unset(target: JsonObject, path: string = ""): JsonObject {
-  let object = target,
-    keys = path.split(".");
+  let object = target;
+  const keys = path.split(".");
   while (keys.length) {
     const key = keys.shift() as string;
     if (!keys.length) delete object[key];
@@ -675,7 +674,7 @@ export function unsetcookie(name: string): boolean {
 export const cookie = {
   toSeconds: function (time = 3, e = 0) {
     time = empty(time) ? 0 : time;
-    let now = new Date().getTime();
+    const now = new Date().getTime();
     time = !isNaN(Number(time))
       ? new Date().getTime() + time
       : typeof time === "string"
@@ -716,7 +715,7 @@ export const cookie = {
     return Object.keys(this.all).some((e) => e === key);
   },
   get all() {
-    var cookies: any[] = [];
+    const cookies: any[] = [];
     return (
       document.cookie.split(";").forEach((cookie) => {
         cookies[
