@@ -1,5 +1,5 @@
 {
-  "license": "ISC",
+  "license": "MIT",
   "version": "2.0.8",
   "name": "@arcaelas/utils",
   "homepage": "https://github.com/arcaelas/utils",
@@ -37,8 +37,9 @@
     "build": "tsc && tsc-alias",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "prepublishOnly": "yarn build && npm version minor",
-    "postpublish": "rm -rf build/"
+    "prepublishOnly": "rm -rf build && yarn build",
+    "release": "npm publish --access public",
+    "docs": "mkdocs gh-deploy --force"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

@@ -1,0 +1,32 @@
+site_name: Utils
+site_description: A small box of tools, which are implemented in different factions of the library.
+site_author: Arcaelas Insiders
+site_url: https://arcaelas.github.io/utils/
+
+repo_name: arcaelas/utils
+repo_url: https://github.com/arcaelas/utils
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2026 Arcaelas Insiders
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
