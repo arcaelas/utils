@@ -20,9 +20,9 @@
     "email": "community@arcaelas.com",
     "url": "https://github.com/arcaelas/utils/issues"
   },
-  "main": "build/index.js",
+  "main": "./build/cjs/index.js",
   "files": [
-    "build/"
+    "build"
   ],
   "author": {
     "name": "Arcaelas Insiders",
@@ -34,12 +34,10 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsc && tsc-alias",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
-    "prepublishOnly": "rm -rf build && yarn build",
+    "build": "rm -rf build && tsc --module commonjs --moduleResolution node --outDir build/cjs && tsc-alias --outDir build/cjs && echo '{\"type\":\"commonjs\"}' > build/cjs/package.json && tsc --module ESNext --moduleResolution bundler --outDir build/esm && tsc-alias --resolve-full-paths --outDir build/esm && echo '{\"type\":\"module\"}' > build/esm/package.json",
+    "docs": "mkdocs gh-deploy --force",
     "release": "npm publish --access public",
-    "docs": "mkdocs gh-deploy --force"
+    "prepublishOnly": "yarn build"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
@@ -48,5 +46,14 @@
     "tsc-alias": "^1.8.16",
     "typescript": "^5.0.4",
     "typescript-eslint": "^8.0.0"
+  },
+  "module": "./build/esm/index.js",
+  "types": "./build/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/esm/index.d.ts",
+      "import": "./build/esm/index.js",
+      "require": "./build/cjs/index.js"
+    }
   }
 }
