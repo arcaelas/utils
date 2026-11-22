@@ -3,10 +3,10 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "commonjs",
-    "moduleResolution": "node",
-    "baseUrl": "./",
+    "moduleResolution": "bundler",
+    "rootDir": "./src",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["./src/*"]
     },
     "outDir": "./build",
     "declaration": true,
@@ -20,7 +20,6 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "downlevelIteration": true,
     "lib": ["ESNext", "DOM"],
     "useDefineForClassFields": false,
     "strictPropertyInitialization": false

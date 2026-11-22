@@ -1,15 +1,13 @@
 ![Arcaelas Insiders Banner](https://raw.githubusercontent.com/arcaelas/dist/main/banner/svg/dark.svg#gh-dark-mode-only)
 ![Arcaelas Insiders Banner](https://raw.githubusercontent.com/arcaelas/dist/main/banner/svg/light.svg#gh-light-mode-only)
 
-# Welcome to Arcaelas Insiders!
+# @arcaelas/utils
 
-Hello, if this is your first time reading the **Arcaelas Insiders** documentation, let me tell you that you have found a good place to learn.
+Small dependency-free helpers for TypeScript and JavaScript: value checks (`blank`, `empty`), dotted-path object access (`get`, `set`, `has`, `unset`, `keys`, `merge`), async helpers (`promify`, `sleep`), `rand`, the `query` matcher, `source` templates and browser cookies (`setcookie`, `unsetcookie`, `cookie`). It ships CommonJS and ES modules with their type declarations.
 
-**Our team** and *community* are happy to write and make methods simple to implement and understand, but I think you already know that.
-
-Let's start with the basic implementation steps.
-`npm i --save @arcaelas/utils`
-`yarn add --save @arcaelas/utils`
+```bash
+yarn add @arcaelas/utils
+```
 
 ## Table of Contents
 - [Installation](#installation)
